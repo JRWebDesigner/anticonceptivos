@@ -1,88 +1,105 @@
-import { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { db } from '@/firebase';
-import { collection, addDoc } from 'firebase/firestore';
+"use client";
+
+import { motion } from "framer-motion";
+import Link from "next/link";
+
+const Button = ({ children, className = '', ...props }) => (
+  <button
+    className={`bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition ${className}`}
+    {...props}
+  >
+    {children}
+  </button>
+);
 
 export default function HomePage() {
-  const [step, setStep] = useState(0);
-  const [answers, setAnswers] = useState<number[]>([]);
-
-  const steps = [
-    { title: "Bienvenido", content: "Explora y aprende sobre los diferentes métodos anticonceptivos de forma interactiva." },
-    { title: "Métodos Naturales", content: "Observación del ciclo, moco cervical, temperatura basal y más." },
-    { title: "Métodos de Barrera", content: "Condones, diafragmas, capuchones, esponjas anticonceptivas." },
-    { title: "Métodos Hormonales", content: "Píldoras, inyecciones, parches, anillos, implantes." },
-    { title: "Dispositivos Intrauterinos", content: "DIU de cobre y hormonal, alta eficacia por años." },
-    { title: "Métodos Quirúrgicos", content: "Ligadura de trompas y vasectomía, soluciones permanentes." },
-
-    // Cuestionario completo
-    { title: "Pregunta 1", content: "¿Los métodos anticonceptivos son...?", options: ["Sustancias que impiden que nazca él bebe", "Sustancias y/o procedimientos que impiden el embarazo", "Sustancias que causan daño a la mujer", "Ninguna de las anteriores"], correct: 1 },
-    { title: "Pregunta 2", content: "¿Los métodos anticonceptivos pueden ser usados por...?", options: ["Solo el hombre", "La pareja", "Solo la mujer", "Ninguna de las anteriores"], correct: 1 },
-    { title: "Pregunta 3", content: "¿Cuáles son métodos anticonceptivos para mujeres?", options: ["Condón, coito interrumpido, vasectomía", "Píldora, método del ritmo, T de cobre", "Condón, píldora, T de cobre", "Ninguna de las anteriores"], correct: 2 },
-    { title: "Pregunta 4", content: "¿Cuáles son métodos anticonceptivos para hombres?", options: ["Condón, coito interrumpido, vasectomía", "Píldora, métodos del ritmo, T de cobre", "Condón, píldora, T de cobre", "Ninguna de las anteriores"], correct: 0 },
-    { title: "Pregunta 5", content: "¿Qué métodos requieren supervisión médica?", options: ["Píldora, inyecciones, T de cobre", "Método del ritmo, coito interrumpido", "Diafragma", "Todas las anteriores", "Ninguna de las anteriores"], correct: 0 },
-    { title: "Pregunta 6", content: "¿Cuáles son los métodos de barrera?", options: ["Método de calendario (ritmo)", "T de cobre (dispositivo intrauterino)", "Píldoras o inyecciones", "Ligadura de trompas – vasectomía", "Condón (preservativo) – Diafragma"], correct: 4 },
-    { title: "Pregunta 7", content: "¿En qué momento se debe colocar el condón (preservativo)?", options: ["Antes de la penetración", "Durante la penetración", "Antes de la eyaculación", "A y B", "Ninguna de las anteriores"], correct: 0 },
-    { title: "Pregunta 8", content: "¿Tiene efectos secundarios los Métodos de Barrera?", options: ["Sí", "No", "A veces", "Ninguna de las anteriores"], correct: 2 },
-    { title: "Pregunta 9", content: "¿Cuáles son los métodos naturales?", options: ["Ritmo", "Diafragma", "Método Billings o Moco cervical", "Condón", "A y C"], correct: 4 },
-    { title: "Pregunta 10", content: "¿Quiénes pueden utilizar el método del ritmo?", options: ["Todas las mujeres sexualmente activas", "Mujeres con ciclo menstrual irregular", "Mujeres con ciclo menstrual regular", "Todas las anteriores", "Ninguna de las anteriores"], correct: 2 },
-    { title: "Pregunta 11", content: "¿La presencia del moco cervical son los días...?", options: ["Inicio del ciclo menstrual", "Mediados del ciclo menstrual", "Inicio de la menstruación", "Término de la menstruación", "Ninguna de las anteriores"], correct: 1 },
-    { title: "Pregunta 12", content: "¿El método del ritmo consiste en tener relaciones los días...?", options: ["Los días fértiles", "Los días infértiles", "Todos los días", "Ninguna de las anteriores"], correct: 1 },
-    { title: "Pregunta 13", content: "¿Cuáles son los métodos hormonales?", options: ["Condón y diafragma", "Píldoras y diafragma", "Diafragma e inyectable", "Inyectables y píldoras", "Ninguna de las anteriores"], correct: 3 },
-    { title: "Pregunta 14", content: "¿Los efectos secundarios más conocidos son...?", options: ["Dolor de cabeza y suspensión del ciclo menstrual", "Subida de peso y dolor de cabeza", "Cambios en el ánimo", "B y C", "Todas las anteriores"], correct: 4 },
-    { title: "Pregunta 15", content: "¿Los métodos hormonales evitan...?", options: ["Infección de transmisión sexual", "La menstruación", "La fecundación", "La ovulación", "Ninguna de las anteriores"], correct: 3 },
-    { title: "Pregunta 16", content: "¿Los inyectables se usan...?", options: ["Cada mes", "Cada 6 meses", "Cada 3 meses", "A y B", "A y C"], correct: 4 },
-    { title: "Pregunta 17", content: "¿Los métodos quirúrgicos son...?", options: ["Métodos de Billings", "Ligadura de trompas", "Vasectomía", "A y B", "B y C"], correct: 4 },
-    { title: "Pregunta 18", content: "¿La vasectomía es...?", options: ["Método quirúrgico parcial", "Método quirúrgico definitivo", "Eliminación de los espermatozoides", "Cierre de los conductos seminales", "Ninguna de las anteriores"], correct: 1 },
-    { title: "Pregunta 19", content: "¿La intervención quirúrgica de ligadura de trompas consiste en...?", options: ["Atar las trompas de Falopio", "Cortar las trompas de Falopio", "Obstruir las trompas de Falopio", "A y C", "B y C"], correct: 4 },
-    { title: "Pregunta 20", content: "La vasectomía es efectiva a partir de los...?", options: ["7 días", "1 semana", "2 semanas", "3 meses", "6 meses"], correct: 3 },
-
-    { title: "Fin del cuestionario", content: "Gracias por participar. Puedes ver las estadísticas pronto." }
-  ];
-
-  const handleAnswer = async (index: number) => {
-    setAnswers([...answers, index]);
-    const currentStep = steps[step];
-    if ('correct' in currentStep) {
-      await addDoc(collection(db, 'quiz_responses'), {
-        question: currentStep.content,
-        selected: currentStep.options?.[index],
-        correct: currentStep.correct === index,
-        timestamp: new Date()
-      });
-    }
-    setStep(Math.min(steps.length - 1, step + 1));
-  };
-
-  const current = steps[step];
   return (
-    <main className="min-h-screen bg-gradient-to-b from-indigo-100 to-white flex items-center justify-center p-4">
-      <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="max-w-xl w-full">
-        <Card className="rounded-2xl shadow-xl p-6">
-          <CardContent>
-            <h1 className="text-2xl font-bold mb-2 text-indigo-700">{current.title}</h1>
-            <p className="mb-4 text-gray-700 text-lg">{current.content}</p>
-            {current.options && (
-              <div className="space-y-2">
-                {current.options.map((opt, idx) => (
-                  <Button key={idx} onClick={() => handleAnswer(idx)} className="w-full">
-                    {opt}
-                  </Button>
-                ))}
-              </div>
-            )}
-            {!current.options && (
-              <div className="flex justify-between mt-4">
-                <Button onClick={() => setStep(Math.max(0, step - 1))} disabled={step === 0}>Anterior</Button>
-                <Button onClick={() => setStep(Math.min(steps.length - 1, step + 1))}>Siguiente</Button>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </motion.div>
+    <main className="bg-gradient-to-b from-indigo-100 to-white min-h-screen py-12 px-6">
+      <motion.section
+        initial={{ opacity: 0, y: 40 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7 }}
+        className="max-w-4xl mx-auto"
+      >
+        <h1 className="text-4xl font-bold text-indigo-700 mb-6 text-center">
+          Guía de Métodos Anticonceptivos
+        </h1>
+        <p className="text-lg text-gray-700 mb-10 text-center">
+          El conocimiento sobre anticoncepción es fundamental para tomar decisiones informadas sobre salud sexual y reproductiva. Esta guía está dirigida a profesionales de la salud, educadores y a cualquier persona interesada en conocer sus opciones de planificación familiar.
+        </p>
+
+        <div className="space-y-12 text-gray-800">
+          <Section title="1. Métodos Naturales" delay={0.2}>
+            <p className="mb-2">Estos métodos se basan en la observación y comprensión del ciclo menstrual para identificar los días fértiles y evitar relaciones sexuales en esos períodos. Requieren disciplina y conocimiento del cuerpo.</p>
+            <ul className="list-disc list-inside ml-4">
+              <li><strong>MELA:</strong> Lactancia exclusiva como anticonceptivo durante los primeros seis meses posparto. Eficacia del 98%.</li>
+              <li><strong>Ritmo:</strong> Cálculo de días fértiles basado en ciclos menstruales anteriores. Eficacia del 76%.</li>
+              <li><strong>Temperatura Basal:</strong> Medición diaria antes de levantarse para detectar ovulación.</li>
+              <li><strong>Método del Moco Cervical (Billings):</strong> Observación de cambios en el moco cervical.</li>
+              <li><strong>Sintotérmico:</strong> Combinación de temperatura, moco y otros signos físicos.</li>
+              <li><strong>Coitus interruptus:</strong> Retiro del pene antes de eyacular. Eficacia del 78% en uso típico.</li>
+            </ul>
+            <p className="mt-2 text-sm text-red-600">Nota: No protegen contra ITS y requieren educación adecuada.</p>
+          </Section>
+
+          <Section title="2. Métodos de Barrera" delay={0.3}>
+            <p className="mb-2">Impedimento físico del paso de espermatozoides al óvulo. Algunos protegen contra ITS.</p>
+            <ul className="list-disc list-inside ml-4">
+              <li><strong>Condón Masculino:</strong> Funda que cubre el pene. Eficacia del 85%.</li>
+              <li><strong>Condón Femenino:</strong> Funda que se inserta en la vagina. Eficacia del 79%.</li>
+              <li><strong>Diafragma:</strong> Copa flexible que cubre el cuello uterino. Eficacia del 88% con espermicida.</li>
+              <li><strong>Capuchón Cervical:</strong> Más pequeño que el diafragma. Eficacia del 71% al 86%.</li>
+              <li><strong>Esponja Anticonceptiva:</strong> Esponja impregnada con espermicida. Eficacia del 76% al 88%.</li>
+              <li><strong>Espermicidas:</strong> Sustancias químicas que inmovilizan espermatozoides. Eficacia del 72% usados solos.</li>
+            </ul>
+            <p className="mt-2 text-sm text-red-600">Error común: No todos previenen ITS, solo los de barrera lo hacen.</p>
+          </Section>
+
+          <Section title="3. Métodos Hormonales" delay={0.4}>
+            <p className="mb-2">Utilizan hormonas sintéticas que inhiben la ovulación, espesan el moco cervical y alteran el endometrio.</p>
+            <ul className="list-disc list-inside ml-4">
+              <li><strong>Píldoras combinadas:</strong> Estrógeno y progestina. Uso diario. >99% eficacia. Regulan ciclo, alivian dolor menstrual.</li>
+              <li><strong>Minipíldora:</strong> Solo progestina. Uso diario a la misma hora. 99% eficacia. Apta en lactancia.</li>
+              <li><strong>Parche:</strong> Libera hormonas vía piel. Semanal. 99% eficacia. No se ve afectado por vómitos.</li>
+              <li><strong>Anillo vaginal:</strong> Flexible, se coloca por 3 semanas. 99% eficacia. Solo requiere atención mensual.</li>
+              <li><strong>Inyecciones:</strong> Cada 8 a 12 semanas. Más del 99% eficaz. Aplicadas por profesional.</li>
+              <li><strong>Implante subdérmico:</strong> Bajo la piel del brazo. Dura 3 a 5 años. 99.95% eficacia.</li>
+            </ul>
+            <p className="mt-2 text-sm text-red-600">No protegen contra ITS. Pueden causar efectos secundarios y requieren prescripción médica.</p>
+          </Section>
+
+          <Section title="4. Dispositivos Intrauterinos (DIU)" delay={0.5}>
+            <ul className="list-disc list-inside ml-4">
+              <li><strong>DIU de cobre:</strong> Plástico con cobre. Espermicida natural. Dura hasta 10 años. Eficacia >99%.</li>
+              <li><strong>DIU hormonal:</strong> Libera progestina. Espesa moco cervical, adelgaza endometrio. 3 a 8 años. ~99% eficacia.</li>
+            </ul>
+            <p className="mt-2 text-sm">Ventajas: No requiere mantenimiento diario, alta eficacia, rápida reversibilidad.<br />Desventajas: Posibles cambios menstruales. No protegen contra ITS.</p>
+          </Section>
+
+          <Section title="5. Métodos Permanentes" delay={0.6}>
+            <p className="mb-2">Procedimientos quirúrgicos para personas que no desean más hijos.</p>
+            <ul className="list-disc list-inside ml-4">
+              <li><strong>Ligadura de trompas:</strong> Bloqueo de trompas. >99% eficacia. Laparoscopia o minilaparotomía. Puede ser ambulatoria.</li>
+              <li><strong>Vasectomía:</strong> Bloqueo de conductos deferentes. Anestesia local, 20 minutos. Casi 100% eficaz.</li>
+            </ul>
+            <p className="mt-2 text-sm">Ventajas: No afectan ciclo ni hormonas. Bajo mantenimiento. <br />Riesgos: Poca posibilidad de falla quirúrgica o reconexión. No protegen contra ITS.</p>
+          </Section>
+        </div>
+
+        <div className="mt-16 text-center">
+          <Link href="/">
+            <Button className="text-lg">Ir al Cuestionario</Button>
+          </Link>
+        </div>
+      </motion.section>
     </main>
   );
 }
+
+const Section = ({ title, children, delay = 0.2 }) => (
+  <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} transition={{ delay }} className="space-y-2">
+    <h2 className="text-2xl font-semibold text-indigo-600 mb-2">{title}</h2>
+    <div className="text-md leading-relaxed">{children}</div>
+  </motion.div>
+);
 

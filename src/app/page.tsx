@@ -127,12 +127,12 @@ useEffect(() => {
       >
         <header className="text-center mb-20">
           <Image src="/logo.png" alt="Logo" width={100} height={100} className="mx-auto mb-4" />
-          <h1 className="text-6xl font-extrabold text-indigo-800 drop-shadow-sm leading-tight">
+          <h1 className="text-3xl md:text-6xl font-extrabold text-indigo-800 drop-shadow-sm leading-tight">
             Guía de Métodos Anticonceptivos
           </h1>
         </header>
         
-        <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md py-4 mb-12 border-b border-indigo-200 shadow-sm">
+        <nav className="hidden md:sticky top-0 z-50 bg-white/80 backdrop-blur-md py-4 mb-12 border-b border-indigo-200 shadow-sm">
           <div className="flex flex-wrap justify-center gap-4">
             {navItems.map(item => (
               <Link
@@ -217,7 +217,7 @@ useEffect(() => {
         </section>
 
         <div className="mt-24 text-center">
-          <Link href="/">
+          <Link href="/cuestionario">
             <Button className="text-lg">Ir al Cuestionario</Button>
           </Link>
         </div>

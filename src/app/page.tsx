@@ -60,31 +60,31 @@ function Section({ title, image, delay, children, id }: SectionProps) {
 export default function HomePage() {
   const [activeSection, setActiveSection] = useState<string>("");
 
-  useEffect(() => {
-    const links = document.querySelectorAll('a[href^="#"]');
-    
-    const handleClick = (e: MouseEvent) => {
-      e.preventDefault();
-      const target = document.querySelector((e.currentTarget as HTMLAnchorElement).getAttribute('href') || '');
-      if (target) {
-        window.scrollTo({
-          top: (target as HTMLElement).offsetTop - 100,
-          behavior: 'smooth'
-        });
-      }
-    };
 
-    links.forEach(link => {
-      link.addEventListener('click', handleClick);
-    });
-
-    return () => {
-      links.forEach(link => {
-        link.removeEventListener('click', handleClick);
+useEffect(() => {
+  const links = document.querySelectorAll<HTMLAnchorElement>('a[href^="#"]');
+  
+  const handleClick = (e: Event) => {
+    e.preventDefault();
+    const target = document.querySelector((e.currentTarget as HTMLAnchorElement).getAttribute('href') || '');
+    if (target) {
+      window.scrollTo({
+        top: (target as HTMLElement).offsetTop - 100,
+        behavior: 'smooth'
       });
-    };
-  }, []);
+    }
+  };
 
+  links.forEach(link => {
+    link.addEventListener('click', handleClick as EventListener);
+  });
+
+  return () => {
+    links.forEach(link => {
+      link.removeEventListener('click', handleClick as EventListener);
+    });
+  };
+}, []);
   useEffect(() => {
     const observerOptions: IntersectionObserverInit = {
       root: null,

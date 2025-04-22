@@ -3,11 +3,12 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
-interface ButtonProps {
+
+interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   children: React.ReactNode;
   className?: string;
-  [key: string]: any; // Para las props adicionales
 }
+
 const Button = ({ children, className = '', ...props }: ButtonProps) => (
   <button
     className={`bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition ${className}`}
@@ -21,7 +22,8 @@ interface NavItem {
   title: string;
   id: string;
 }
-const navItems: NavItem[] =  [
+
+const navItems: NavItem[] = [
   { title: "Introducción", id: "" },
   { title: "1. Métodos Naturales", id: "naturales" },
   { title: "2. Métodos de Barrera", id: "barrera" },
@@ -30,7 +32,6 @@ const navItems: NavItem[] =  [
   { title: "5. Métodos Permanentes", id: "permanentes" },
 ];
 
-
 interface SectionProps {
   title: string;
   image: string;
@@ -38,37 +39,68 @@ interface SectionProps {
   children: React.ReactNode;
   id?: string;
 }
+
+function Section({ title, image, delay, children, id }: SectionProps) {
+  return (
+    <motion.section
+      id={id}
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ delay, duration: 0.6 }}
+      viewport={{ once: true }}
+      className="bg-white/90 backdrop-blur-md p-8 rounded-xl shadow-lg border border-indigo-200 scroll-mt-32"
+    >
+      <h2 className="text-4xl font-bold text-indigo-700 mb-6">{title}</h2>
+      <Image src={image} alt={title} width={1000} height={500} className="rounded-xl mb-6" />
+      <div className="text-lg leading-relaxed text-gray-800 space-y-4">{children}</div>
+    </motion.section>
+  );
+}
+
 export default function HomePage() {
- const [activeSection, setActiveSection] = useState("");
+  const [activeSection, setActiveSection] = useState<string>("");
 
   useEffect(() => {
     const links = document.querySelectorAll('a[href^="#"]');
+    
+    const handleClick = (e: MouseEvent) => {
+      e.preventDefault();
+      const target = document.querySelector((e.currentTarget as HTMLAnchorElement).getAttribute('href') || '');
+      if (target) {
+        window.scrollTo({
+          top: (target as HTMLElement).offsetTop - 100,
+          behavior: 'smooth'
+        });
+      }
+    };
+
     links.forEach(link => {
-      link.addEventListener('click', (e) => {
-        e.preventDefault();
-        const target = document.querySelector(link.getAttribute('href') as HTMLElement);
-        if (target) {
-          window.scrollTo({
-            top: target.offsetTop - 100,
-            behavior: 'smooth'
-          });
-        }
-      });
+      link.addEventListener('click', handleClick);
     });
 
+    return () => {
+      links.forEach(link => {
+        link.removeEventListener('click', handleClick);
+      });
+    };
+  }, []);
+
+  useEffect(() => {
     const observerOptions: IntersectionObserverInit = {
       root: null,
       rootMargin: "0px",
       threshold: 0.5
     };
 
-    const observer = new IntersectionObserver((entries) => {
+    const handleIntersection: IntersectionObserverCallback = (entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
           setActiveSection(entry.target.id);
         }
       });
-    }, observerOptions);
+    };
+
+    const observer = new IntersectionObserver(handleIntersection, observerOptions);
 
     navItems.forEach(item => {
       if (item.id) {
@@ -81,12 +113,7 @@ export default function HomePage() {
     });
 
     return () => {
-      navItems.forEach(item => {
-        if (item.id) {
-          const section = document.getElementById(item.id);
-          if (section) observer.unobserve(section);
-        }
-      });
+      observer.disconnect();
     };
   }, []);
 
@@ -104,6 +131,7 @@ export default function HomePage() {
             Guía de Métodos Anticonceptivos
           </h1>
         </header>
+        
         <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md py-4 mb-12 border-b border-indigo-200 shadow-sm">
           <div className="flex flex-wrap justify-center gap-4">
             {navItems.map(item => (
@@ -112,7 +140,7 @@ export default function HomePage() {
                 href={`#${item.id}`}
                 className={`px-4 py-2 rounded-lg transition font-semibold ${
                   activeSection === item.id || 
-                  (item.id === "" && activeSection === undefined)
+                  (item.id === "" && activeSection === "")
                     ? "bg-indigo-600 text-white shadow-md"
                     : "bg-indigo-100 hover:bg-indigo-200 text-indigo-800"
                 }`}
@@ -122,7 +150,8 @@ export default function HomePage() {
             ))}
           </div>
         </nav>
-        <section className="space-y-32">
+        
+       <section className="space-y-32">
           <Section
             title="Introducción"
             image="/images/intro.jpg"
@@ -196,21 +225,3 @@ export default function HomePage() {
     </main>
   );
 }
-
-function Section({ title, image, delay, children, id }: SectionProps) {
-  return (
-    <motion.section
-      id={id}
-      initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      transition={{ delay, duration: 0.6 }}
-      viewport={{ once: true }}
-      className="bg-white/90 backdrop-blur-md p-8 rounded-xl shadow-lg border border-indigo-200 scroll-mt-32"
-    >
-      <h2 className="text-4xl font-bold text-indigo-700 mb-6">{title}</h2>
-      <Image src={image} alt={title} width={1000} height={500} className="rounded-xl mb-6" />
-      <div className="text-lg leading-relaxed text-gray-800 space-y-4">{children}</div>
-    </motion.section>
-  );
-}
-

@@ -1,10 +1,14 @@
 "use client";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
-
-const Button = ({ children, className = '', ...props }) => (
+interface ButtonProps {
+  children: React.ReactNode;
+  className?: string;
+  [key: string]: any; // Para las props adicionales
+}
+const Button = ({ children, className = '', ...props }: ButtonProps) => (
   <button
     className={`bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition ${className}`}
     {...props}
@@ -12,7 +16,12 @@ const Button = ({ children, className = '', ...props }) => (
     {children}
   </button>
 );
-const navItems = [
+
+interface NavItem {
+  title: string;
+  id: string;
+}
+const navItems: NavItem[] =  [
   { title: "Introducción", id: "" },
   { title: "1. Métodos Naturales", id: "naturales" },
   { title: "2. Métodos de Barrera", id: "barrera" },
@@ -22,13 +31,22 @@ const navItems = [
 ];
 
 
+interface SectionProps {
+  title: string;
+  image: string;
+  delay: number;
+  children: React.ReactNode;
+  id?: string;
+}
 export default function HomePage() {
- useEffect(() => {
+ const [activeSection, setActiveSection] = useState("");
+
+  useEffect(() => {
     const links = document.querySelectorAll('a[href^="#"]');
     links.forEach(link => {
       link.addEventListener('click', (e) => {
         e.preventDefault();
-        const target = document.querySelector(link.getAttribute('href'));
+        const target = document.querySelector(link.getAttribute('href') as HTMLElement);
         if (target) {
           window.scrollTo({
             top: target.offsetTop - 100,
@@ -37,7 +55,41 @@ export default function HomePage() {
         }
       });
     });
+
+    const observerOptions: IntersectionObserverInit = {
+      root: null,
+      rootMargin: "0px",
+      threshold: 0.5
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          setActiveSection(entry.target.id);
+        }
+      });
+    }, observerOptions);
+
+    navItems.forEach(item => {
+      if (item.id) {
+        const section = document.getElementById(item.id);
+        if (section) observer.observe(section);
+      } else {
+        const introSection = document.querySelector('section:first-of-type');
+        if (introSection) observer.observe(introSection);
+      }
+    });
+
+    return () => {
+      navItems.forEach(item => {
+        if (item.id) {
+          const section = document.getElementById(item.id);
+          if (section) observer.unobserve(section);
+        }
+      });
+    };
   }, []);
+
   return (
     <main className="bg-fixed bg-[url('/bg-pattern.svg')] bg-cover min-h-screen py-20 px-4 md:px-12 text-gray-900">
       <motion.div
@@ -52,13 +104,18 @@ export default function HomePage() {
             Guía de Métodos Anticonceptivos
           </h1>
         </header>
-<nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md py-4 mb-12 border-b border-indigo-200 shadow-sm">
+        <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md py-4 mb-12 border-b border-indigo-200 shadow-sm">
           <div className="flex flex-wrap justify-center gap-4">
             {navItems.map(item => (
               <Link
                 key={item.id}
                 href={`#${item.id}`}
-                className="bg-indigo-100 hover:bg-indigo-200 text-indigo-800 font-semibold px-4 py-2 rounded-lg transition"
+                className={`px-4 py-2 rounded-lg transition font-semibold ${
+                  activeSection === item.id || 
+                  (item.id === "" && activeSection === undefined)
+                    ? "bg-indigo-600 text-white shadow-md"
+                    : "bg-indigo-100 hover:bg-indigo-200 text-indigo-800"
+                }`}
               >
                 {item.title}
               </Link>
@@ -140,7 +197,7 @@ export default function HomePage() {
   );
 }
 
-function Section({ title, image, delay, children, id }) {
+function Section({ title, image, delay, children, id }: SectionProps) {
   return (
     <motion.section
       id={id}

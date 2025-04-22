@@ -132,7 +132,7 @@ useEffect(() => {
           </h1>
         </header>
         
-        <nav className="hidden md:sticky top-0 z-50 bg-white/80 backdrop-blur-md py-4 mb-12 border-b border-indigo-200 shadow-sm">
+        <nav className="block md:sticky top-0 z-50 bg-white/80 backdrop-blur-md py-4 mb-12 border-b border-indigo-200 shadow-sm">
           <div className="flex flex-wrap justify-center gap-4">
             {navItems.map(item => (
               <Link

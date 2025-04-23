@@ -377,7 +377,7 @@ export default function HomePage() {
                         <Image src="/images/diu.jpg" alt="DIU" width={1000} height={500} className="rounded-xl mb-6" />
                         <div className="text-lg leading-relaxed text-gray-800 space-y-4">
                           <ul className="list-disc list-inside space-y-1">
-                            <li><strong>DIU de Cobre:</strong> Dispositivo plástico en forma de "T" recubierto de cobre. Funciona como espermicida. Dura hasta 10 años. Más del 99% de eficacia.</li>
+                            <li><strong>DIU de Cobre:</strong> Dispositivo plástico en forma de T recubierto de cobre. Funciona como espermicida. Dura hasta 10 años. Más del 99% de eficacia.</li>
                             <li><strong>DIU Hormonal:</strong> Libera una pequeña cantidad de progestina en el útero. Espesa el moco cervical, inhibe la ovulación. Dura de 3 a 8 años. 99% de eficacia.</li>
                           </ul>
                           <p className="text-red-600">Ventajas: Alta eficacia, larga duración, reversibilidad rápida. No protegen contra ITS. El de cobre puede aumentar el sangrado los primeros meses.</p>

@@ -8,6 +8,7 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LabelList,
   LineChart, Line, Legend, PieChart, Pie, Cell
 } from "recharts";
+import { PieLabelRenderProps } from "recharts";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 
@@ -497,7 +498,7 @@ export default function StatsDashboard() {
                           fill="#8884d8"
                           dataKey="value"
                           nameKey="name"
-                          label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                          label={(props: PieLabelRenderProps) => `${props.name}: ${(props.percent * 100).toFixed(0)}%`}
                         >
                           {categoryChartData.map((entry, index) => (
                             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />

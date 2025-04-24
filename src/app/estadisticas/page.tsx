@@ -498,7 +498,7 @@ export default function StatsDashboard() {
                           fill="#8884d8"
                           dataKey="value"
                           nameKey="name"
-                          llabel={(props: PieLabelRenderProps) =>
+                          label={(props: PieLabelRenderProps) =>
   props.percent !== undefined
     ? `${props.name}: ${(props.percent * 100).toFixed(0)}%`
     : props.name || ""

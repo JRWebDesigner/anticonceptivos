@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { collection, getDocs, query, orderBy } from "firebase/firestore";
 import { db } from "../../lib/firebase";
+import { Timestamp } from "firebase/firestore";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LabelList,
   LineChart, Line, Legend, PieChart, Pie, Cell
@@ -13,7 +14,7 @@ import { es } from "date-fns/locale";
 interface ResponseData {
   id: string;
   answers: number[];
-  timestamp: any;
+  timestamp: Timestamp;
   userId?: string;
   userName?: string;
 }
@@ -344,14 +345,14 @@ export default function StatsDashboard() {
     const userName = response.userName || `Usuario ${userId.slice(0, 6)}`;
     
     if (!acc[userId]) {
-      acc[userId] = {
-        name: userName,
-        correct: 0,
-        total: 0,
-        count: 0,
-        lastResponse: response.timestamp
-      };
-    }
+    acc[userId] = {
+      name: userName,
+      correct: 0,
+      total: 0,
+      count: 0,
+      lastResponse: response.timestamp as Timestamp
+    };
+  }
     
     const correctAnswers = response.answers.reduce((sum, answer, i) => {
       if (answer !== null) {

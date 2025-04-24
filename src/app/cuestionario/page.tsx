@@ -1,6 +1,8 @@
 "use client";
 import { useState } from "react";
 import { motion } from "framer-motion";
+import Link from "next/link";
+import { saveResponses } from "../../lib/saveResponses"; 
 
 interface Question {
   id: number;
@@ -276,6 +278,7 @@ export default function Questionnaire() {
 
   const handleComplete = () => {
     setIsComplete(true);
+    saveResponses(answers);
   };
 
   const resetQuiz = () => {
@@ -402,6 +405,14 @@ export default function Questionnaire() {
                 )}
               </div>
             </div>
+                            <div className="flex justify-center mt-6">
+  <Link
+    href="/"
+    className="px-6 py-2 bg-gray-200 text-gray-800 rounded-lg font-medium hover:bg-gray-300 transition-colors"
+  >
+    Volver al inicio
+  </Link>
+</div>
           </motion.div>
         ) : (
           <motion.div
@@ -435,12 +446,20 @@ export default function Questionnaire() {
               </p>
             </div>
 
-            <button
-              onClick={resetQuiz}
-              className="px-6 py-3 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 transition-colors"
-            >
-              Volver al inicio
-            </button>
+            <div className="flex justify-center gap-4 mt-6">
+  <button
+    onClick={resetQuiz}
+    className="px-6 py-3 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 transition-colors"
+  >
+    Reiniciar cuestionario
+  </button>
+  <Link
+    href="/"
+    className="px-6 py-3 bg-gray-300 text-gray-800 rounded-lg font-medium hover:bg-gray-400 transition-colors"
+  >
+    Volver al inicio
+  </Link>
+</div>
           </motion.div>
         )}
 

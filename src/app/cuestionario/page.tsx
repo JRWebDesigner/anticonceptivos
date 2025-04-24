@@ -295,7 +295,6 @@ export default function Questionnaire() {
           className="text-center mb-10"
         >
           <h1 className="text-4xl font-bold text-indigo-800 mb-2">Cuestionario sobre Métodos Anticonceptivos</h1>
-          <p className="text-lg text-indigo-600">Test your knowledge about contraceptive methods</p>
         </motion.div>
 
         {!isComplete ? (
@@ -445,9 +444,9 @@ export default function Questionnaire() {
           </motion.div>
         )}
 
-        <div className="mt-8 text-center text-gray-500 text-sm">
+        {/*<div className="mt-8 text-center text-gray-500 text-sm">
           <p>Este cuestionario es solo con fines educativos.</p>
-        </div>
+        </div>*/}
       </div>
     </div>
   );

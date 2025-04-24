@@ -498,7 +498,12 @@ export default function StatsDashboard() {
                           fill="#8884d8"
                           dataKey="value"
                           nameKey="name"
-                          label={(props: PieLabelRenderProps) => `${props.name}: ${(props.percent * 100).toFixed(0)}%`}
+                          llabel={(props: PieLabelRenderProps) =>
+  props.percent !== undefined
+    ? `${props.name}: ${(props.percent * 100).toFixed(0)}%`
+    : props.name || ""
+}
+
                         >
                           {categoryChartData.map((entry, index) => (
                             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />

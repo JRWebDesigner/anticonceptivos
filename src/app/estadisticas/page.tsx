@@ -1,4 +1,5 @@
 "use client"
+<<<<<<< HEAD
 import { useEffect, useState } from 'react';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '@/firebase';
@@ -44,6 +45,13 @@ export default function EstadisticasPage() {
           </ResponsiveContainer>
         </CardContent>
       </Card>
+=======
+
+export default function EstadisticasPage() {
+  return (
+    <main className="min-h-screen bg-white flex flex-col items-center p-4">
+      <h1 className="text-3xl font-bold text-indigo-700 mb-4">Estadísticas del Cuestionario</h1>
+>>>>>>> be3309cc727d04acba7aac387caf4d66002172f3
     </main>
   );
 }

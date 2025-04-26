@@ -132,23 +132,27 @@ export default function HomePage() {
   ];
 
   const videos = [
-    {
-      title: "Métodos Anticonceptivos Naturales",
-      src: "https://www.youtube.com/embed/ejemplo1"
-    },
-    {
-      title: "Uso Correcto de Métodos de Barrera",
-      src: "https://www.youtube.com/embed/ejemplo2"
-    },
-    {
-      title: "Guía de Métodos Hormonales",
-      src: "https://www.youtube.com/embed/ejemplo3"
-    },
-    {
-      title: "Todo sobre los DIU",
-      src: "https://www.youtube.com/embed/ejemplo4"
-    }
-  ];
+  {
+    title: "Métodos Anticonceptivos Naturales",
+    src: "https://www.youtube.com/embed/_5s5dN5-LPI"
+  },
+  {
+    title: "Métodos de Barrera",
+    src: "https://www.youtube.com/embed/SBXwN1RSoXE"
+  },
+  {
+    title: "Métodos Hormonales",
+    src: "https://www.youtube.com/embed/cTLhUk7BlEA"
+  },
+  {
+    title: "Métodos Hormonales",
+    src: "https://www.youtube.com/embed/AeIa0-odX6M"
+  },
+  {
+    title: "Métodos DIU",
+    src: "https://www.youtube.com/embed/AeIa0-odX6M"
+  }
+];
 
   useEffect(() => {
     const links = document.querySelectorAll<HTMLAnchorElement>('a[href^="#"]');
@@ -214,7 +218,7 @@ export default function HomePage() {
         className="max-w-5xl mx-auto"
       >
         <header className="text-center mb-20">
-          <Image src="/logo.png" alt="Logo" width={100} height={100} className="mx-auto mb-4" />
+          <Image src="/logo.png" alt="Logo" width={180} height={180} className="mx-auto mb-4" />
           <h1 className="text-3xl md:text-6xl font-extrabold text-indigo-800 drop-shadow-sm leading-tight">
             Guía de Métodos Anticonceptivos
           </h1>

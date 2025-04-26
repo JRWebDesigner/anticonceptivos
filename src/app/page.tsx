@@ -146,7 +146,7 @@ export default function HomePage() {
   },
   {
     title: "Métodos Hormonales",
-    src: "https://www.youtube.com/embed/AeIa0-odX6M"
+    src: "https://www.youtube.com/embed/SqG7j8c-7zc"
   },
   {
     title: "Métodos DIU",

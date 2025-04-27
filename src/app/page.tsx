@@ -282,7 +282,7 @@ export default function HomePage() {
               <p>El conocimiento sobre anticoncepción es fundamental para tomar decisiones informadas sobre salud sexual y reproductiva. Esta guía está dirigida a profesionales de la salud, educadores y a cualquier persona interesada en conocer sus opciones de planificación familiar.</p>
               {expandedIntro && (
                 <div className="mt-4 space-y-4">
-                  <p class="mb-4">
+                  <p className="mb-4">
       Según la Organización Mundial de la Salud, el embarazo adolescente es un fenómeno 
       que ocurre a nivel mundial, con causas que son conocidas y que traen graves consecuencias 
       para la salud, la sociedad y la economía. El embarazo adolescente es más frecuente en 
@@ -291,13 +291,13 @@ export default function HomePage() {
       obstáculos para obtener y usar anticonceptivos que eviten embarazos no deseados.
     </p>
 
-    <p class=" mb-4">
+    <p className=" mb-4">
       De acuerdo con el Sistema Nacional de Información en Salud (SNIS), los indicadores de 
       embarazos en adolescentes de entre 10 y 19 años registraron una disminución en los 
       últimos 9 años, observándose lo siguiente:
     </p>
 
-    <ul class="list-disc list-inside space-y-2 mb-6">
+    <ul className="list-disc list-inside space-y-2 mb-6">
       <li><strong>2015:</strong> 82.416 embarazos</li>
       <li><strong>2016:</strong> 68.916 embarazos</li>
       <li><strong>2017:</strong> 60.850 embarazos</li>
@@ -309,7 +309,7 @@ export default function HomePage() {
       <li><strong>2023:</strong> 32.660 embarazos</li>
     </ul>
 
-    <p class="text-gray-700">
+    <p className="text-gray-700">
       Se registró una disminución del <strong>28.07%</strong> en la gestión 2018 y del <strong>14.28%</strong> hasta la gestión 2023.
     </p>
                 </div>

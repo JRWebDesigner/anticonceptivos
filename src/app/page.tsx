@@ -282,8 +282,36 @@ export default function HomePage() {
               <p>El conocimiento sobre anticoncepción es fundamental para tomar decisiones informadas sobre salud sexual y reproductiva. Esta guía está dirigida a profesionales de la salud, educadores y a cualquier persona interesada en conocer sus opciones de planificación familiar.</p>
               {expandedIntro && (
                 <div className="mt-4 space-y-4">
-                  <p>En esta guía encontrarás información detallada sobre los diferentes métodos anticonceptivos disponibles, sus mecanismos de acción, eficacia, ventajas y desventajas.</p>
-                  <p>La información proporcionada aquí tiene fines educativos y no sustituye el consejo médico profesional. Siempre consulta con un especialista en salud para determinar el método más adecuado para ti.</p>
+                  <p class="mb-4">
+      Según la Organización Mundial de la Salud, el embarazo adolescente es un fenómeno 
+      que ocurre a nivel mundial, con causas que son conocidas y que traen graves consecuencias 
+      para la salud, la sociedad y la economía. El embarazo adolescente es más frecuente en 
+      personas con menor educación o de bajo estatus económico. Esto también puede ser causado 
+      por el matrimonio infantil y el abuso sexual de niñas. Además, está acompañado de los 
+      obstáculos para obtener y usar anticonceptivos que eviten embarazos no deseados.
+    </p>
+
+    <p class=" mb-4">
+      De acuerdo con el Sistema Nacional de Información en Salud (SNIS), los indicadores de 
+      embarazos en adolescentes de entre 10 y 19 años registraron una disminución en los 
+      últimos 9 años, observándose lo siguiente:
+    </p>
+
+    <ul class="list-disc list-inside space-y-2 mb-6">
+      <li><strong>2015:</strong> 82.416 embarazos</li>
+      <li><strong>2016:</strong> 68.916 embarazos</li>
+      <li><strong>2017:</strong> 60.850 embarazos</li>
+      <li><strong>2018:</strong> 56.910 embarazos</li>
+      <li><strong>2019:</strong> 49.044 embarazos</li>
+      <li><strong>2020:</strong> 39.470 embarazos</li>
+      <li><strong>2021:</strong> 39.747 embarazos</li>
+      <li><strong>2022:</strong> 35.470 embarazos</li>
+      <li><strong>2023:</strong> 32.660 embarazos</li>
+    </ul>
+
+    <p class="text-gray-700">
+      Se registró una disminución del <strong>28.07%</strong> en la gestión 2018 y del <strong>14.28%</strong> hasta la gestión 2023.
+    </p>
                 </div>
               )}
             </Section>

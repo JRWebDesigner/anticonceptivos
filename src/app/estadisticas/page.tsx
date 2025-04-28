@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { collection, getDocs, query, orderBy, writeBatch, doc } from "firebase/firestore";
+import { collection, getDocs, query, orderBy, writeBatch} from "firebase/firestore";
 import { db } from "../../lib/firebase";
 import { Timestamp } from "firebase/firestore";
 import {

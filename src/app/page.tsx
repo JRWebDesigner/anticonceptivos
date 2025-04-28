@@ -121,8 +121,8 @@ export default function HomePage() {
   const [activeSection, setActiveSection] = useState<string>("intro");
   const [activeTab, setActiveTab] = useState<string>("naturales");
   const [expandedIntro, setExpandedIntro] = useState(true);
-  const [showQuestionnaire, setShowQuestionnaire] = useState(true);
-
+const [showQuestionnaire, setShowQuestionnaire] = useState(true);
+const [questionnaireCompleted, setQuestionnaireCompleted] = useState(false);
   const methodTabs = [
     { id: "naturales", label: "Naturales" },
     { id: "barrera", label: "Barrera" },
@@ -240,36 +240,29 @@ export default function HomePage() {
               </Link>
             ))}
           </div>
-        </nav>
-        
+        </nav>      
         {/* Questionnaire Modal */}
-        <AnimatePresence>
-          {showQuestionnaire && (
-            <motion.div
-              initial={{ opacity: 0, y: -50 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -50 }}
-              transition={{ duration: 0.3 }}
-              className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 bg-white p-6 rounded-xl shadow-xl border border-indigo-300 max-w-md w-full"
-            >
-              <div className="flex justify-between items-start mb-4">
-                <h3 className="text-xl font-bold text-indigo-800">Cuestionario Inicial</h3>
-                <button 
-                  onClick={() => setShowQuestionnaire(false)}
-                  className="text-gray-500 hover:text-gray-700"
-                >
-                  ✕
-                </button>
-              </div>
-              <p className="mb-4">Por favor complete este breve cuestionario para ayudarnos a personalizar su experiencia.</p>
-              <Link href="/cuestionario">
-                <Button className="w-full">Ir al Cuestionario</Button>
-              </Link>
-            </motion.div>
-          )}
-        </AnimatePresence>
+<AnimatePresence>
+  {showQuestionnaire && !questionnaireCompleted && (
+    <motion.div
+      initial={{ opacity: 0, y: -50 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -50 }}
+      transition={{ duration: 0.3 }}
+      className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 bg-white p-6 rounded-xl shadow-xl border border-indigo-300 max-w-md w-full"
+    >
+      <div className="mb-4">
+        <h3 className="text-xl font-bold text-indigo-800">Cuestionario Inicial</h3>
+      </div>
+      <p className="mb-4">Debe completar este cuestionario para acceder al contenido.</p>
+      <Link href="/cuestionario">
+        <Button className="w-full">Ir al Cuestionario</Button>
+      </Link>
+    </motion.div>
+  )}
+</AnimatePresence>
 
-        <div className="space-y-32">
+        <div className={`space-y-32 ${!questionnaireCompleted ? 'opacity-50 pointer-events-none' : ''}`}>
           {/* Introduction Section */}
           <section id="intro" className="scroll-mt-32">
             <Section

@@ -27,7 +27,6 @@ const navItems: NavItem[] = [
   { title: "Introducción", id: "intro" },
   { title: "Métodos", id: "methods" },
   { title: "Videos", id: "videos" },
-  { title: "Cuestionario", id: "questionnaire" },
 ];
 
 interface SectionProps {
@@ -216,14 +215,14 @@ export default function HomePage() {
         transition={{ duration: 1 }}
         className="max-w-5xl mx-auto"
       >
-        <header className="text-center mb-20 opacity-20">
+        <header className="text-center mb-20 ">
           <Image src="/logo.png" alt="Logo" width={180} height={180} className="mx-auto mb-4" />
           <h1 className="text-3xl md:text-6xl font-extrabold text-indigo-800 drop-shadow-sm leading-tight">
             Guía de Métodos Anticonceptivos
           </h1>
         </header>
         
-        <nav className="opacity-20 block md:sticky top-0 z-50 bg-white/80 backdrop-blur-md py-4 mb-12 border-b border-indigo-200 shadow-sm">
+        <nav className="block md:sticky top-0 z-50 bg-white/80 backdrop-blur-md py-4 mb-12 border-b border-indigo-200 shadow-sm">
           <div className="flex flex-wrap justify-center gap-4">
             {navItems.map(item => (
               <Link
@@ -241,25 +240,7 @@ export default function HomePage() {
           </div>
         </nav>
         
-        {/* Questionnaire Modal */}
-        <AnimatePresence>
-            <motion.div
-              initial={{ opacity: 0, y: -50 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -50 }}
-              transition={{ duration: 0.3 }}
-              className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 bg-white p-6 rounded-xl shadow-xl border border-indigo-300 max-w-md w-full"
-            >
-              <div className="flex justify-between items-start mb-4">
-                <h3 className="text-xl font-bold text-indigo-800">Cuestionario Inicial</h3>
-              </div>
-              <p className="mb-4">Por favor complete este breve cuestionario para ayudarnos a personalizar su experiencia.</p>
-              <Link href="/cuestionario">
-                <Button className="w-full">Ir al Cuestionario</Button>
-              </Link>
-            </motion.div>
-        </AnimatePresence>
-        <div className="space-y-32 opacity-20">
+        <div className="space-y-32 ">
           {/* Introduction Section */}
           <section id="intro" className="scroll-mt-32">
             <Section
@@ -441,23 +422,6 @@ export default function HomePage() {
                   <VideoCard key={index} title={video.title} src={video.src} />
                 ))}
               </div>
-            </motion.div>
-          </section>
-
-          {/* Questionnaire Section */}
-          <section id="questionnaire" className="scroll-mt-32">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2, duration: 0.6 }}
-              viewport={{ once: true }}
-              className="bg-white/90 backdrop-blur-md p-8 rounded-xl shadow-lg border border-indigo-200 text-center"
-            >
-              <h2 className="text-4xl font-bold text-indigo-700 mb-6">Cuestionario</h2>
-              <p className="text-lg mb-8">Complete nuestro cuestionario para evaluar su conocimiento sobre métodos anticonceptivos y recibir recomendaciones personalizadas.</p>
-              <Link href="/cuestionario">
-                <Button className="text-lg mx-auto">Comenzar Cuestionario</Button>
-              </Link>
             </motion.div>
           </section>
         </div>

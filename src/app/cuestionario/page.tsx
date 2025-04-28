@@ -405,14 +405,6 @@ export default function Questionnaire() {
                 )}
               </div>
             </div>
-                            <div className="flex justify-center mt-6">
-  <Link
-    href="/"
-    className="px-6 py-2 bg-gray-200 text-gray-800 rounded-lg font-medium hover:bg-gray-300 transition-colors"
-  >
-    Volver al inicio
-  </Link>
-</div>
           </motion.div>
         ) : (
           <motion.div
@@ -454,10 +446,10 @@ export default function Questionnaire() {
     Reiniciar cuestionario
   </button>
   <Link
-    href="/"
+    href="/info"
     className="px-6 py-3 bg-gray-300 text-gray-800 rounded-lg font-medium hover:bg-gray-400 transition-colors"
   >
-    Volver al inicio
+    Siguiente
   </Link>
 </div>
           </motion.div>

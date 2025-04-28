@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { collection, getDocs, query, orderBy } from "firebase/firestore";
+import { collection, getDocs, query, orderBy, writeBatch, doc } from "firebase/firestore";
 import { db } from "../../lib/firebase";
 import { Timestamp } from "firebase/firestore";
 import {
@@ -11,6 +11,7 @@ import {
 import { PieLabelRenderProps } from "recharts";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
+import * as XLSX from 'xlsx';
 
 interface ResponseData {
   id: string;
@@ -267,12 +268,65 @@ const questions: Question[] = [
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82CA9D'];
 
-export default function StatsDashboard() {
+export default function StatsDashboard() {  
   const [responses, setResponses] = useState<ResponseData[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("general");
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
+  const [isResetting, setIsResetting] = useState(false);
 
+  const exportToExcel = () => {
+    // Crear hoja de resumen general
+    const generalSheet = XLSX.utils.json_to_sheet(
+      generalChartData.map((data, i) => ({
+        "Pregunta": `P${i + 1}`,
+        "Texto": questions[i].text,
+        "Aciertos": `${generalStats[i]?.correct || 0}/${generalStats[i]?.total || 0}`,
+        "Porcentaje Acierto": `${data.correctRate.toFixed(1)}%`,
+        "Categoría": questions[i].category || "General"
+      }))
+    );
+
+    // Crear hoja por usuario
+    const usersSheet = XLSX.utils.json_to_sheet(
+      userChartData.map(user => ({
+        "Usuario": user.name,
+        "ID Usuario": user.userId,
+        "Aciertos por pregunta": `${user.correctRate.toFixed(1)}%`,
+        "Puntaje promedio": `${user.averageScore.toFixed(1)}%`,
+        "Respuestas completadas": user.responses,
+        "Última respuesta": user.lastResponse
+      }))
+    );
+
+    // Crear hoja por fecha
+    const datesSheet = XLSX.utils.json_to_sheet(
+      dateChartData.map(date => ({
+        "Fecha": date.date,
+        "Respuestas": date.responses,
+        "Aciertos por pregunta": `${date.correctRate.toFixed(1)}%`,
+        "Puntaje promedio": `${date.averageScore.toFixed(1)}%`
+      }))
+    );
+
+    // Crear hoja de categorías
+    const categoriesSheet = XLSX.utils.json_to_sheet(
+      categoryChartData.map(cat => ({
+        "Categoría": cat.name,
+        "Porcentaje Acierto": `${cat.value.toFixed(1)}%`,
+        "Respuestas": cat.count
+      }))
+    );
+    // Crear un nuevo libro de trabajo
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, generalSheet, "Resumen General");
+    XLSX.utils.book_append_sheet(wb, usersSheet, "Por Usuario");
+    XLSX.utils.book_append_sheet(wb, datesSheet, "Por Fecha");
+    XLSX.utils.book_append_sheet(wb, categoriesSheet, "Por Categoría");
+
+    // Generar el archivo Excel
+    XLSX.writeFile(wb, `Estadisticas_${format(new Date(), 'yyyy-MM-dd')}.xlsx`);
+  };
   useEffect(() => {
     const fetchResponses = async () => {
       try {
@@ -401,6 +455,31 @@ export default function StatsDashboard() {
       }
     });
   });
+  const resetStatistics = async () => {
+    if (!confirm("¿Estás seguro que deseas borrar todas las estadísticas? Esta acción no se puede deshacer.")) {
+      return;
+    }
+
+    setIsResetting(true);
+    try {
+      const batch = writeBatch(db);
+      const responsesRef = collection(db, "responses");
+      const snapshot = await getDocs(responsesRef);
+      
+      snapshot.docs.forEach(doc => {
+        batch.delete(doc.ref);
+      });
+
+      await batch.commit();
+      setResponses([]);
+      alert("Todas las estadísticas han sido borradas correctamente.");
+    } catch (error) {
+      console.error("Error al borrar estadísticas:", error);
+      alert("Ocurrió un error al borrar las estadísticas.");
+    } finally {
+      setIsResetting(false);
+    }
+  };
 
   const categoryChartData = Object.entries(categoryStats).map(([name, stats]) => ({
     name,
@@ -417,14 +496,48 @@ export default function StatsDashboard() {
   <>
     <header className='block md:sticky top-0 z-50 bg-white/80 backdrop-blur-md py-4 mb-12 border-b border-indigo-200 shadow-sm '>
     <nav className='flex flex-wrap justify-center gap-4'>
-        <Link className='px-4 py-2 rounded-lg transition font-semibold bg-indigo-100 hover:bg-indigo-200 text-indigo-800' href='/'>Inicio</Link>
+        <Link className='px-4 py-2 rounded-lg transition font-semibold bg-indigo-100 hover:bg-indigo-200 text-indigo-800' href='/info'>Inicio</Link>
         <Link className='px-4 py-2 rounded-lg transition font-semibold bg-indigo-100 hover:bg-indigo-200 text-indigo-800' href='/cuestionario'>Cuestionario</Link>
         <Link className='px-4 py-2 rounded-lg transition font-semibold bg-indigo-100 hover:bg-indigo-200 text-indigo-800' href='/estadisticas'>Estadisticas</Link>
     </nav>
     </header>
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold text-indigo-800 mb-6">Dashboard de Estadísticas</h1>
-      
+           <div className="flex justify-between items-center mb-6">
+          <h1 className="text-3xl font-bold text-indigo-800">Dashboard de Estadísticas</h1>
+          <div className="flex gap-2">
+            <button 
+              onClick={exportToExcel}
+              className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition flex items-center gap-2"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
+              </svg>
+              Exportar a Excel
+            </button>
+            <button 
+              onClick={resetStatistics}
+              disabled={isResetting || responses.length === 0}
+              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition flex items-center gap-2 disabled:bg-red-300 disabled:cursor-not-allowed"
+            >
+              {isResetting ? (
+                <>
+                  <svg className="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Borrando...
+                </>
+              ) : (
+                <>
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
+                  </svg>
+                  Reiniciar Estadísticas
+                </>
+              )}
+            </button>
+          </div>
+        </div>
       {loading ? (
         <div className="text-center py-20">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500 mx-auto"></div>

@@ -9,15 +9,6 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   className?: string;
 }
 
-const Button = ({ children, className = '', ...props }: ButtonProps) => (
-  <button
-    className={`bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition ${className}`}
-    {...props}
-  >
-    {children}
-  </button>
-);
-
 interface NavItem {
   title: string;
   id: string;

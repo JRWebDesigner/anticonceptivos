@@ -121,7 +121,6 @@ export default function HomePage() {
   const [activeSection, setActiveSection] = useState<string>("intro");
   const [activeTab, setActiveTab] = useState<string>("naturales");
   const [expandedIntro, setExpandedIntro] = useState(true);
-  const [showQuestionnaire, setShowQuestionnaire] = useState(true);
 
   const methodTabs = [
     { id: "naturales", label: "Naturales" },
@@ -244,7 +243,6 @@ export default function HomePage() {
         
         {/* Questionnaire Modal */}
         <AnimatePresence>
-          {showQuestionnaire && (
             <motion.div
               initial={{ opacity: 0, y: -50 }}
               animate={{ opacity: 1, y: 0 }}
@@ -260,7 +258,6 @@ export default function HomePage() {
                 <Button className="w-full">Ir al Cuestionario</Button>
               </Link>
             </motion.div>
-          )}
         </AnimatePresence>
 
         <div className="space-y-32">

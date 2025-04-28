@@ -275,7 +275,8 @@ const [questionnaireCompleted, setQuestionnaireCompleted] = useState(false);
 
         <div className={`relative ${!questionnaireCompleted ? 'overflow-hidden max-h-screen' : ''}`}>
   {!questionnaireCompleted && (
-    <div className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm" />
+    <div className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm"></div>
+  )}
           {/* Introduction Section */}
           <section id="intro" className="scroll-mt-32">
             <Section

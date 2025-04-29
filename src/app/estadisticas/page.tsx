@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { collection, getDocs, query, orderBy, writeBatch} from "firebase/firestore";
+import { collection, getDocs, query, orderBy, writeBatch } from "firebase/firestore";
 import { db } from "../../lib/firebase";
 import { Timestamp } from "firebase/firestore";
 import {
@@ -18,7 +18,8 @@ interface ResponseData {
   answers: number[];
   timestamp: Timestamp;
   userId?: string;
-  userName?: string;
+  userName: string;
+  userAge: number;
 }
 
 interface Question {
@@ -268,65 +269,14 @@ const questions: Question[] = [
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82CA9D'];
 
-export default function StatsDashboard() {  
+export default function StatsDashboard() {
   const [responses, setResponses] = useState<ResponseData[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("general");
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
   const [isResetting, setIsResetting] = useState(false);
 
-  const exportToExcel = () => {
-    // Crear hoja de resumen general
-    const generalSheet = XLSX.utils.json_to_sheet(
-      generalChartData.map((data, i) => ({
-        "Pregunta": `P${i + 1}`,
-        "Texto": questions[i].text,
-        "Aciertos": `${generalStats[i]?.correct || 0}/${generalStats[i]?.total || 0}`,
-        "Porcentaje Acierto": `${data.correctRate.toFixed(1)}%`,
-        "Categoría": questions[i].category || "General"
-      }))
-    );
-
-    // Crear hoja por usuario
-    const usersSheet = XLSX.utils.json_to_sheet(
-      userChartData.map(user => ({
-        "Usuario": user.name,
-        "ID Usuario": user.userId,
-        "Aciertos por pregunta": `${user.correctRate.toFixed(1)}%`,
-        "Puntaje promedio": `${user.averageScore.toFixed(1)}%`,
-        "Respuestas completadas": user.responses,
-        "Última respuesta": user.lastResponse
-      }))
-    );
-
-    // Crear hoja por fecha
-    const datesSheet = XLSX.utils.json_to_sheet(
-      dateChartData.map(date => ({
-        "Fecha": date.date,
-        "Respuestas": date.responses,
-        "Aciertos por pregunta": `${date.correctRate.toFixed(1)}%`,
-        "Puntaje promedio": `${date.averageScore.toFixed(1)}%`
-      }))
-    );
-
-    // Crear hoja de categorías
-    const categoriesSheet = XLSX.utils.json_to_sheet(
-      categoryChartData.map(cat => ({
-        "Categoría": cat.name,
-        "Porcentaje Acierto": `${cat.value.toFixed(1)}%`,
-        "Respuestas": cat.count
-      }))
-    );
-    // Crear un nuevo libro de trabajo
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, generalSheet, "Resumen General");
-    XLSX.utils.book_append_sheet(wb, usersSheet, "Por Usuario");
-    XLSX.utils.book_append_sheet(wb, datesSheet, "Por Fecha");
-    XLSX.utils.book_append_sheet(wb, categoriesSheet, "Por Categoría");
-
-    // Generar el archivo Excel
-    XLSX.writeFile(wb, `Estadisticas_${format(new Date(), 'yyyy-MM-dd')}.xlsx`);
-  };
+  // Obtener respuestas de Firestore
   useEffect(() => {
     const fetchResponses = async () => {
       try {
@@ -347,7 +297,7 @@ export default function StatsDashboard() {
     fetchResponses();
   }, []);
 
-  // Datos para gráficos generales
+  // Estadísticas generales
   const generalStats = responses.reduce((acc, response) => {
     response.answers.forEach((answer, i) => {
       if (answer !== null) {
@@ -367,7 +317,7 @@ export default function StatsDashboard() {
     questionText: q.text
   }));
 
-  // Datos por fecha
+  // Estadísticas por fecha
   const dateStats = responses.reduce((acc, response) => {
     const date = format(new Date(response.timestamp?.seconds * 1000), 'yyyy-MM-dd', { locale: es });
     if (!acc[date]) acc[date] = { correct: 0, total: 0, count: 0 };
@@ -394,20 +344,21 @@ export default function StatsDashboard() {
     responses: stats.count
   }));
 
-  // Datos por usuario
+  // Estadísticas por usuario
   const userStats = responses.reduce((acc, response) => {
     const userId = response.userId || "anonymous";
     const userName = response.userName || `Usuario ${userId.slice(0, 6)}`;
     
     if (!acc[userId]) {
-    acc[userId] = {
-      name: userName,
-      correct: 0,
-      total: 0,
-      count: 0,
-      lastResponse: response.timestamp as Timestamp
-    };
-  }
+      acc[userId] = {
+        name: userName,
+        age: response.userAge,
+        correct: 0,
+        total: 0,
+        count: 0,
+        lastResponse: response.timestamp as Timestamp
+      };
+    }
     
     const correctAnswers = response.answers.reduce((sum, answer, i) => {
       if (answer !== null) {
@@ -426,18 +377,19 @@ export default function StatsDashboard() {
     }
     
     return acc;
-  }, {} as Record<string, { name: string; correct: number; total: number; count: number; lastResponse: any }>);
+  }, {} as Record<string, { name: string; age: number; correct: number; total: number; count: number; lastResponse: any }>);
 
   const userChartData = Object.entries(userStats).map(([userId, stats]) => ({
     userId,
     name: stats.name,
+    age: stats.age,
     correctRate: stats.total ? (stats.correct / stats.total) * 100 : 0,
     averageScore: stats.count ? (stats.correct / (stats.count * questions.length)) * 100 : 0,
     responses: stats.count,
     lastResponse: format(new Date(stats.lastResponse?.seconds * 1000), 'PPpp', { locale: es })
   }));
 
-  // Datos para gráfico de categorías
+  // Estadísticas por categoría
   const categoryStats = questions.reduce((acc, question) => {
     const category = question.category || "General";
     if (!acc[category]) acc[category] = { correct: 0, total: 0 };
@@ -455,6 +407,181 @@ export default function StatsDashboard() {
       }
     });
   });
+
+  const categoryChartData = Object.entries(categoryStats).map(([name, stats]) => ({
+    name,
+    value: stats.total ? (stats.correct / stats.total) * 100 : 0,
+    count: stats.total
+  }));
+
+  // Estadísticas por edad
+  const ageStats = responses.reduce((acc, response) => {
+    const age = response.userAge;
+    if (!acc[age]) acc[age] = { correct: 0, total: 0, count: 0, users: new Set() };
+    
+    acc[age].users.add(response.userId);
+    
+    const correctAnswers = response.answers.reduce((sum, answer, i) => {
+      if (answer !== null) {
+        acc[age].total++;
+        if (answer === questions[i].correctAnswer) {
+          return sum + 1;
+        }
+      }
+      return sum;
+    }, 0);
+    
+    acc[age].correct += correctAnswers;
+    acc[age].count++;
+    return acc;
+  }, {} as Record<number, { correct: number; total: number; count: number; users: Set<string> }>);
+
+  const ageChartData = Object.entries(ageStats).map(([age, stats]) => ({
+    age: `${age} años`,
+    correctRate: stats.total ? (stats.correct / stats.total) * 100 : 0,
+    averageScore: stats.count ? (stats.correct / (stats.count * questions.length)) * 100 : 0,
+    responses: stats.count,
+    users: stats.users.size
+  }));
+
+  // Datos de usuario seleccionado
+  const userResponses = selectedUser 
+    ? responses.filter(r => r.userId === selectedUser)
+    : [];
+
+  // Exportar a Excel
+  const exportToExcel = () => {
+  // Hoja 1: Respuestas detalladas (mejorada)
+  const responsesSheet = responses.map((response, idx) => {
+    const answersFormatted = response.answers.map((answer, i) => {
+      if (answer === null) return 'Sin responder';
+      const isCorrect = answer === questions[i].correctAnswer;
+      return `${answer + 1} (${isCorrect ? '✔' : '✘'})`;
+    });
+
+    const correctAnswers = response.answers.reduce((sum, answer, i) => {
+      return answer === questions[i].correctAnswer ? sum + 1 : sum;
+    }, 0);
+    
+    const percentage = (correctAnswers / questions.length * 100).toFixed(1);
+
+    return {
+      "ID": idx + 1,
+      "Usuario": response.userName,
+      "Edad": response.userAge,
+      "Fecha": format(new Date(response.timestamp?.seconds * 1000), 'dd/MM/yyyy HH:mm', { locale: es }),
+      "Puntaje Total": `${correctAnswers}/${questions.length}`,
+      "Porcentaje": `${percentage}%`,
+      ...questions.reduce((acc, q, i) => {
+        acc[`P${i + 1}`] = answersFormatted[i];
+        return acc;
+      }, {} as Record<string, string>)
+    };
+  });
+
+  // Hoja 2: Resumen por edad (mejorado)
+  const ageSummarySheet = ageChartData.map(age => ({
+    "Grupo de Edad": age.age,
+    "Usuarios Únicos": age.users,
+    "Total Respuestas": age.responses,
+    "Preguntas Correctas": `${age.correctRate.toFixed(1)}%`,
+    "Puntaje Promedio": `${age.averageScore.toFixed(1)}%`,
+    "Desempeño": getPerformanceLevel(age.averageScore)
+  }));
+
+  // Hoja 3: Resumen por pregunta
+  const questionsSheet = questions.map((q, i) => {
+    const total = generalStats[i]?.total || 0;
+    const correct = generalStats[i]?.correct || 0;
+    const percentage = total ? ((correct / total) * 100).toFixed(1) : '0';
+
+    return {
+      "ID Pregunta": `P${i + 1}`,
+      "Categoría": q.category || "General",
+      "Texto Pregunta": q.text,
+      "Respuesta Correcta": q.options[q.correctAnswer],
+      "Total Respuestas": total,
+      "Aciertos": correct,
+      "Porcentaje Acierto": `${percentage}%`,
+      "Dificultad": getDifficultyLevel(correct, total)
+    };
+  });
+
+  // Hoja 4: Resumen por usuario
+  const usersSheet = userChartData.map(user => ({
+    "ID Usuario": user.userId,
+    "Nombre": user.name,
+    "Edad": user.age,
+    "Total Respuestas": user.responses,
+    "Puntaje Promedio": `${user.averageScore.toFixed(1)}%`,
+    "Última Participación": user.lastResponse,
+    "Nivel de Desempeño": getPerformanceLevel(user.averageScore)
+  }));
+
+  // Función auxiliar para determinar nivel de desempeño
+  function getPerformanceLevel(score: number): string {
+    if (score >= 85) return "Excelente";
+    if (score >= 70) return "Bueno";
+    if (score >= 50) return "Regular";
+    return "Necesita mejorar";
+  }
+
+  // Función auxiliar para determinar dificultad
+  function getDifficultyLevel(correct: number, total: number): string {
+    if (total === 0) return "Sin datos";
+    const percentage = (correct / total) * 100;
+    if (percentage >= 70) return "Fácil";
+    if (percentage >= 40) return "Moderada";
+    return "Difícil";
+  }
+
+  // Crear libro Excel
+  const wb = XLSX.utils.book_new();
+  
+  // Hoja de respuestas con formato mejorado
+  const wsResponses = XLSX.utils.json_to_sheet(responsesSheet);
+  wsResponses["!cols"] = [
+    { width: 5 },  // ID
+    { width: 20 }, // Usuario
+    { width: 8 },  // Edad
+    { width: 16 }, // Fecha
+    { width: 12 }, // Puntaje
+    { width: 12 }, // Porcentaje
+    ...questions.map(() => ({ width: 10 })) // Columnas de preguntas
+  ];
+  XLSX.utils.book_append_sheet(wb, wsResponses, "Respuestas");
+  
+  // Hoja de resumen por edad
+  const wsAge = XLSX.utils.json_to_sheet(ageSummarySheet);
+  wsAge["!cols"] = [
+    { width: 12 }, { width: 12 }, { width: 12 }, 
+    { width: 14 }, { width: 14 }, { width: 14 }
+  ];
+  XLSX.utils.book_append_sheet(wb, wsAge, "Por Edad");
+  
+  // Hoja de preguntas
+  const wsQuestions = XLSX.utils.json_to_sheet(questionsSheet);
+  wsQuestions["!cols"] = [
+    { width: 10 }, { width: 15 }, { width: 40 }, 
+    { width: 25 }, { width: 12 }, { width: 10 },
+    { width: 14 }, { width: 12 }
+  ];
+  XLSX.utils.book_append_sheet(wb, wsQuestions, "Preguntas");
+  
+  // Hoja de usuarios
+  const wsUsers = XLSX.utils.json_to_sheet(usersSheet);
+  wsUsers["!cols"] = [
+    { width: 15 }, { width: 20 }, { width: 8 }, 
+    { width: 12 }, { width: 14 }, { width: 18 },
+    { width: 16 }
+  ];
+  XLSX.utils.book_append_sheet(wb, wsUsers, "Usuarios");
+
+  // Generar el archivo Excel
+  XLSX.writeFile(wb, `Estadisticas_${format(new Date(), 'yyyy-MM-dd')}.xlsx`);
+};
+
+  // Reiniciar estadísticas
   const resetStatistics = async () => {
     if (!confirm("¿Estás seguro que deseas borrar todas las estadísticas? Esta acción no se puede deshacer.")) {
       return;
@@ -481,33 +608,73 @@ export default function StatsDashboard() {
     }
   };
 
-  const categoryChartData = Object.entries(categoryStats).map(([name, stats]) => ({
-    name,
-    value: stats.total ? (stats.correct / stats.total) * 100 : 0,
-    count: stats.total
-  }));
-
-  // Datos de usuario seleccionado
-  const userResponses = selectedUser 
-    ? responses.filter(r => r.userId === selectedUser)
-    : [];
+  // Componente de información demográfica
+  const DemographicInfo = () => (
+    <div className="bg-white p-6 rounded-lg shadow-md mb-8">
+      <h2 className="text-xl font-semibold mb-4 text-indigo-700">Información Demográfica</h2>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <h3 className="font-medium text-gray-700 mb-3">Distribución por Edad</h3>
+          <div className="h-64">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={ageChartData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="age" />
+                <YAxis />
+                <Tooltip 
+                  formatter={(value: number, name: string) => 
+                    name === 'users' 
+                      ? [`${value} usuarios`, "Usuarios únicos"]
+                      : [`${value}`, name]
+                  }
+                />
+                <Legend />
+                <Bar dataKey="users" fill="#8884d8" name="Usuarios únicos" />
+                <Bar dataKey="responses" fill="#82ca9d" name="Respuestas totales" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+        
+        <div>
+          <h3 className="font-medium text-gray-700 mb-3">Rendimiento por Edad</h3>
+          <div className="h-64">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={ageChartData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="age" />
+                <YAxis domain={[0, 100]} tickFormatter={(val) => `${val}%`} />
+                <Tooltip formatter={(value: number) => [`${value}%`, "Porcentaje"]} />
+                <Legend />
+                <Bar dataKey="correctRate" fill="#6366f1" name="Aciertos" />
+                <Bar dataKey="averageScore" fill="#82ca9d" name="Puntaje promedio" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 
   return (
-  <>
-    <header className='block md:sticky top-0 z-50 bg-white/80 backdrop-blur-md py-4 mb-12 border-b border-indigo-200 shadow-sm '>
-    <nav className='flex flex-wrap justify-center gap-4'>
-        <Link className='px-4 py-2 rounded-lg transition font-semibold bg-indigo-100 hover:bg-indigo-200 text-indigo-800' href='/info'>Inicio</Link>
-        <Link className='px-4 py-2 rounded-lg transition font-semibold bg-indigo-100 hover:bg-indigo-200 text-indigo-800' href='/cuestionario'>Cuestionario</Link>
-        <Link className='px-4 py-2 rounded-lg transition font-semibold bg-indigo-100 hover:bg-indigo-200 text-indigo-800' href='/estadisticas'>Estadisticas</Link>
-    </nav>
-    </header>
-    <div className="container mx-auto px-4 py-8">
-           <div className="flex justify-between items-center mb-6">
+    <>
+      <header className='block md:sticky top-0 z-50 bg-white/80 backdrop-blur-md py-4 mb-12 border-b border-indigo-200 shadow-sm'>
+        <nav className='flex flex-wrap justify-center gap-4'>
+          <Link className='px-4 py-2 rounded-lg transition font-semibold bg-indigo-100 hover:bg-indigo-200 text-indigo-800' href='/info'>Inicio</Link>
+          <Link className='px-4 py-2 rounded-lg transition font-semibold bg-indigo-100 hover:bg-indigo-200 text-indigo-800' href='/cuestionario'>Cuestionario</Link>
+          <Link className='px-4 py-2 rounded-lg transition font-semibold bg-indigo-100 hover:bg-indigo-200 text-indigo-800' href='/estadisticas'>Estadísticas</Link>
+        </nav>
+      </header>
+      
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold text-indigo-800">Dashboard de Estadísticas</h1>
           <div className="flex gap-2">
             <button 
               onClick={exportToExcel}
-              className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition flex items-center gap-2"
+              disabled={responses.length === 0}
+              className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition flex items-center gap-2 disabled:bg-gray-400 disabled:cursor-not-allowed"
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
@@ -538,170 +705,119 @@ export default function StatsDashboard() {
             </button>
           </div>
         </div>
-      {loading ? (
-        <div className="text-center py-20">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Cargando datos...</p>
-        </div>
-      ) : responses.length === 0 ? (
-        <div className="text-center py-20">
-          <p className="text-gray-600">No hay datos disponibles todavía</p>
-        </div>
-      ) : (
-        <>
-          <div className="flex space-x-4 mb-6 border-b border-gray-200">
-            <button
-              className={`px-4 py-2 font-medium ${activeTab === "general" ? "text-indigo-600 border-b-2 border-indigo-600" : "text-gray-500"}`}
-              onClick={() => setActiveTab("general")}
-            >
-              Resumen General
-            </button>
-            <button
-              className={`px-4 py-2 font-medium ${activeTab === "users" ? "text-indigo-600 border-b-2 border-indigo-600" : "text-gray-500"}`}
-              onClick={() => setActiveTab("users")}
-            >
-              Por Usuario
-            </button>
-            <button
-              className={`px-4 py-2 font-medium ${activeTab === "dates" ? "text-indigo-600 border-b-2 border-indigo-600" : "text-gray-500"}`}
-              onClick={() => setActiveTab("dates")}
-            >
-              Por Fecha
-            </button>
+
+        {loading ? (
+          <div className="text-center py-20">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500 mx-auto"></div>
+            <p className="mt-4 text-gray-600">Cargando datos...</p>
           </div>
-
-          {activeTab === "general" && (
-            <div className="space-y-8">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="bg-white p-6 rounded-lg shadow-md">
-                  <h2 className="text-xl font-semibold mb-4 text-indigo-700">Porcentaje de aciertos por pregunta</h2>
-                  <div className="h-80">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <BarChart data={generalChartData} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="name" />
-                        <YAxis domain={[0, 100]} tickFormatter={(val) => `${val}%`} />
-                        <Tooltip 
-                          formatter={(val: number) => [`${val.toFixed(1)}%`, "Porcentaje de acierto"]}
-                          labelFormatter={(label) => `Pregunta ${label}`}
-                        />
-                        <Bar dataKey="correctRate" fill="#6366f1">
-                          <LabelList 
-                            dataKey="correctRate" 
-                            position="top" 
-                            formatter={(val: number) => `${val.toFixed(1)}%`} 
-                          />
-                        </Bar>
-                      </BarChart>
-                    </ResponsiveContainer>
-                  </div>
-                </div>
-
-                <div className="bg-white p-6 rounded-lg shadow-md">
-                  <h2 className="text-xl font-semibold mb-4 text-indigo-700">Aciertos por categoría</h2>
-                  <div className="h-80">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <PieChart>
-                        <Pie
-                          data={categoryChartData}
-                          cx="50%"
-                          cy="50%"
-                          labelLine={false}
-                          outerRadius={80}
-                          fill="#8884d8"
-                          dataKey="value"
-                          nameKey="name"
-                          label={(props: PieLabelRenderProps) =>
-  props.percent !== undefined
-    ? `${props.name}: ${(props.percent * 100).toFixed(0)}%`
-    : props.name || ""
-}
-
-                        >
-                          {categoryChartData.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                          ))}
-                        </Pie>
-                        <Tooltip formatter={(value: number) => [`${value.toFixed(1)}%`, "Porcentaje de acierto"]} />
-                        <Legend />
-                      </PieChart>
-                    </ResponsiveContainer>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-white p-6 rounded-lg shadow-md">
-                <h2 className="text-xl font-semibold mb-4 text-indigo-700">Detalle de preguntas</h2>
-                <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
-                      <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pregunta</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Texto</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aciertos</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Porcentaje</th>
-                      </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                      {generalChartData.map((data, i) => (
-                        <tr key={i}>
-                          <td className="px-6 py-4 whitespace-nowrap font-medium">P{i + 1}</td>
-                          <td className="px-6 py-4 whitespace-normal max-w-xs">{questions[i].text}</td>
-                          <td className="px-6 py-4 whitespace-nowrap">{generalStats[i]?.correct || 0} / {generalStats[i]?.total || 0}</td>
-                          <td className="px-6 py-4 whitespace-nowrap">{data.correctRate.toFixed(1)}%</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
+        ) : responses.length === 0 ? (
+          <div className="text-center py-20">
+            <p className="text-gray-600">No hay datos disponibles todavía</p>
+          </div>
+        ) : (
+          <>
+            <div className="flex space-x-4 mb-6 border-b border-gray-200">
+              <button
+                className={`px-4 py-2 font-medium ${activeTab === "general" ? "text-indigo-600 border-b-2 border-indigo-600" : "text-gray-500"}`}
+                onClick={() => setActiveTab("general")}
+              >
+                Resumen General
+              </button>
+              <button
+                className={`px-4 py-2 font-medium ${activeTab === "users" ? "text-indigo-600 border-b-2 border-indigo-600" : "text-gray-500"}`}
+                onClick={() => setActiveTab("users")}
+              >
+                Por Usuario
+              </button>
+              <button
+                className={`px-4 py-2 font-medium ${activeTab === "dates" ? "text-indigo-600 border-b-2 border-indigo-600" : "text-gray-500"}`}
+                onClick={() => setActiveTab("dates")}
+              >
+                Por Fecha
+              </button>
             </div>
-          )}
 
-          {activeTab === "users" && (
-            <div className="space-y-8">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="bg-white p-6 rounded-lg shadow-md">
-                  <h2 className="text-xl font-semibold mb-4 text-indigo-700">Rendimiento por usuario</h2>
-                  <div className="h-80">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <BarChart data={userChartData} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="name" />
-                        <YAxis domain={[0, 100]} tickFormatter={(val) => `${val}%`} />
-                        <Tooltip 
-                          formatter={(val: number) => [`${val.toFixed(1)}%`, "Porcentaje de acierto"]}
-                          labelFormatter={(label) => `Usuario: ${label}`}
-                        />
-                        <Legend />
-                        <Bar dataKey="correctRate" fill="#6366f1" name="Aciertos por pregunta" />
-                        <Bar dataKey="averageScore" fill="#82ca9d" name="Puntaje promedio" />
-                      </BarChart>
-                    </ResponsiveContainer>
+            {activeTab === "general" && (
+              <div className="space-y-8">
+                <DemographicInfo />
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="bg-white p-6 rounded-lg shadow-md">
+                    <h2 className="text-xl font-semibold mb-4 text-indigo-700">Porcentaje de aciertos por pregunta</h2>
+                    <div className="h-80">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <BarChart data={generalChartData} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
+                          <CartesianGrid strokeDasharray="3 3" />
+                          <XAxis dataKey="name" />
+                          <YAxis domain={[0, 100]} tickFormatter={(val) => `${val}%`} />
+                          <Tooltip 
+                            formatter={(val: number) => [`${val.toFixed(1)}%`, "Porcentaje de acierto"]}
+                            labelFormatter={(label) => `Pregunta ${label}`}
+                          />
+                          <Bar dataKey="correctRate" fill="#6366f1">
+                            <LabelList 
+                              dataKey="correctRate" 
+                              position="top" 
+                              formatter={(val: number) => `${val.toFixed(1)}%`} 
+                            />
+                          </Bar>
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </div>
+
+                  <div className="bg-white p-6 rounded-lg shadow-md">
+                    <h2 className="text-xl font-semibold mb-4 text-indigo-700">Aciertos por categoría</h2>
+                    <div className="h-80">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <PieChart>
+                          <Pie
+                            data={categoryChartData}
+                            cx="50%"
+                            cy="50%"
+                            labelLine={false}
+                            outerRadius={80}
+                            fill="#8884d8"
+                            dataKey="value"
+                            nameKey="name"
+                            label={(props: PieLabelRenderProps) =>
+                              props.percent !== undefined
+                                ? `${props.name}: ${(props.percent * 100).toFixed(0)}%`
+                                : props.name || ""
+                            }
+                          >
+                            {categoryChartData.map((entry, index) => (
+                              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                            ))}
+                          </Pie>
+                          <Tooltip formatter={(value: number) => [`${value.toFixed(1)}%`, "Porcentaje de acierto"]} />
+                          <Legend />
+                        </PieChart>
+                      </ResponsiveContainer>
+                    </div>
                   </div>
                 </div>
 
                 <div className="bg-white p-6 rounded-lg shadow-md">
-                  <h2 className="text-xl font-semibold mb-4 text-indigo-700">Seleccionar usuario</h2>
-                  <div className="max-h-80 overflow-y-auto">
+                  <h2 className="text-xl font-semibold mb-4 text-indigo-700">Detalle de preguntas</h2>
+                  <div className="overflow-x-auto">
                     <table className="min-w-full divide-y divide-gray-200">
                       <thead className="bg-gray-50">
                         <tr>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Usuario</th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Puntaje</th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Última respuesta</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pregunta</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Texto</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aciertos</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Porcentaje</th>
                         </tr>
                       </thead>
                       <tbody className="bg-white divide-y divide-gray-200">
-                        {userChartData.map((user, i) => (
-                          <tr 
-                            key={i} 
-                            className={`cursor-pointer hover:bg-indigo-50 ${selectedUser === user.userId ? "bg-indigo-100" : ""}`}
-                            onClick={() => setSelectedUser(user.userId)}
-                          >
-                            <td className="px-6 py-4 whitespace-nowrap">{user.name}</td>
-                            <td className="px-6 py-4 whitespace-nowrap">{user.averageScore.toFixed(1)}%</td>
-                            <td className="px-6 py-4 whitespace-nowrap">{user.lastResponse}</td>
+                        {generalChartData.map((data, i) => (
+                          <tr key={i}>
+                            <td className="px-6 py-4 whitespace-nowrap font-medium">P{i + 1}</td>
+                            <td className="px-6 py-4 whitespace-normal max-w-xs">{questions[i].text}</td>
+                            <td className="px-6 py-4 whitespace-nowrap">{generalStats[i]?.correct || 0} / {generalStats[i]?.total || 0}</td>
+                            <td className="px-6 py-4 whitespace-nowrap">{data.correctRate.toFixed(1)}%</td>
                           </tr>
                         ))}
                       </tbody>
@@ -709,129 +825,184 @@ export default function StatsDashboard() {
                   </div>
                 </div>
               </div>
+            )}
 
-              {selectedUser && (
+            {activeTab === "users" && (
+              <div className="space-y-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="bg-white p-6 rounded-lg shadow-md">
+                    <h2 className="text-xl font-semibold mb-4 text-indigo-700">Rendimiento por usuario</h2>
+                    <div className="h-80">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <BarChart data={userChartData} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
+                          <CartesianGrid strokeDasharray="3 3" />
+                          <XAxis dataKey="name" />
+                          <YAxis domain={[0, 100]} tickFormatter={(val) => `${val}%`} />
+                          <Tooltip 
+                            formatter={(val: number) => [`${val.toFixed(1)}%`, "Porcentaje de acierto"]}
+                            labelFormatter={(label) => `Usuario: ${label}`}
+                          />
+                          <Legend />
+                          <Bar dataKey="correctRate" fill="#6366f1" name="Aciertos por pregunta" />
+                          <Bar dataKey="averageScore" fill="#82ca9d" name="Puntaje promedio" />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </div>
+
+                  <div className="bg-white p-6 rounded-lg shadow-md">
+                    <h2 className="text-xl font-semibold mb-4 text-indigo-700">Lista de Usuarios</h2>
+                    <div className="max-h-80 overflow-y-auto">
+                      <table className="min-w-full divide-y divide-gray-200">
+                        <thead className="bg-gray-50">
+                          <tr>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Usuario</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Edad</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Puntaje</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Última respuesta</th>
+                          </tr>
+                        </thead>
+                        <tbody className="bg-white divide-y divide-gray-200">
+                          {userChartData.map((user, i) => (
+                            <tr 
+                              key={i} 
+                              className={`cursor-pointer hover:bg-indigo-50 ${selectedUser === user.userId ? "bg-indigo-100" : ""}`}
+                              onClick={() => setSelectedUser(user.userId)}
+                            >
+                              <td className="px-6 py-4 whitespace-nowrap">{user.name}</td>
+                              <td className="px-6 py-4 whitespace-nowrap">{user.age} años</td>
+                              <td className="px-6 py-4 whitespace-nowrap">{user.averageScore.toFixed(1)}%</td>
+                              <td className="px-6 py-4 whitespace-nowrap">{user.lastResponse}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+
+                {selectedUser && (
+                  <div className="bg-white p-6 rounded-lg shadow-md">
+                    <h2 className="text-xl font-semibold mb-4 text-indigo-700">
+                      Detalle de respuestas para {userStats[selectedUser]?.name}
+                    </h2>
+                    <div className="overflow-x-auto">
+                      <table className="min-w-full divide-y divide-gray-200">
+                        <thead className="bg-gray-50">
+                          <tr>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Puntaje</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Detalle</th>
+                          </tr>
+                        </thead>
+                        <tbody className="bg-white divide-y divide-gray-200">
+                          {userResponses.map((response, i) => {
+                            const correctCount = response.answers.reduce((sum, answer, i) => {
+                              return answer === questions[i].correctAnswer ? sum + 1 : sum;
+                            }, 0);
+                            const score = (correctCount / questions.length) * 100;
+                            const date = format(new Date(response.timestamp?.seconds * 1000), 'PPpp', { locale: es });
+
+                            return (
+                              <tr key={i}>
+                                <td className="px-6 py-4 whitespace-nowrap">{date}</td>
+                                <td className="px-6 py-4 whitespace-nowrap">{score.toFixed(1)}%</td>
+                                <td className="px-6 py-4 whitespace-normal">
+                                  <div className="flex flex-wrap gap-1">
+                                    {response.answers.map((answer, j) => (
+                                      <span 
+                                        key={j}
+                                        className={`inline-block w-6 h-6 rounded-full text-xs flex items-center justify-center ${
+                                          answer === questions[j].correctAnswer 
+                                            ? "bg-green-100 text-green-800" 
+                                            : answer === null 
+                                              ? "bg-gray-100 text-gray-800" 
+                                              : "bg-red-100 text-red-800"
+                                        }`}
+                                        title={`P${j + 1}: ${questions[j].text}`}
+                                      >
+                                        {j + 1}
+                                      </span>
+                                    ))}
+                                  </div>
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {activeTab === "dates" && (
+              <div className="space-y-8">
                 <div className="bg-white p-6 rounded-lg shadow-md">
-                  <h2 className="text-xl font-semibold mb-4 text-indigo-700">
-                    Detalle de respuestas para {userStats[selectedUser]?.name}
-                  </h2>
+                  <h2 className="text-xl font-semibold mb-4 text-indigo-700">Rendimiento por fecha</h2>
+                  <div className="h-96">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart data={dateChartData} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="date" />
+                        <YAxis domain={[0, 100]} tickFormatter={(val) => `${val}%`} />
+                        <Tooltip 
+                          formatter={(val: number) => [`${val.toFixed(1)}%`, "Porcentaje de acierto"]}
+                          labelFormatter={(label) => `Fecha: ${label}`}
+                        />
+                        <Legend />
+                        <Line 
+                          type="monotone" 
+                          dataKey="correctRate" 
+                          stroke="#6366f1" 
+                          name="Aciertos por pregunta" 
+                          strokeWidth={2}
+                          dot={{ r: 4 }}
+                        />
+                        <Line 
+                          type="monotone" 
+                          dataKey="averageScore" 
+                          stroke="#82ca9d" 
+                          name="Puntaje promedio" 
+                          strokeWidth={2}
+                          dot={{ r: 4 }}
+                        />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+
+                <div className="bg-white p-6 rounded-lg shadow-md">
+                  <h2 className="text-xl font-semibold mb-4 text-indigo-700">Detalle por fecha</h2>
                   <div className="overflow-x-auto">
                     <table className="min-w-full divide-y divide-gray-200">
                       <thead className="bg-gray-50">
                         <tr>
                           <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Puntaje</th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Detalle</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Respuestas</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aciertos por pregunta</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Puntaje promedio</th>
                         </tr>
                       </thead>
                       <tbody className="bg-white divide-y divide-gray-200">
-                        {userResponses.map((response, i) => {
-                          const correctCount = response.answers.reduce((sum, answer, i) => {
-                            return answer === questions[i].correctAnswer ? sum + 1 : sum;
-                          }, 0);
-                          const score = (correctCount / questions.length) * 100;
-                          const date = format(new Date(response.timestamp?.seconds * 1000), 'PPpp', { locale: es });
-
-                          return (
-                            <tr key={i}>
-                              <td className="px-6 py-4 whitespace-nowrap">{date}</td>
-                              <td className="px-6 py-4 whitespace-nowrap">{score.toFixed(1)}%</td>
-                              <td className="px-6 py-4 whitespace-normal">
-                                <div className="flex flex-wrap gap-1">
-                                  {response.answers.map((answer, j) => (
-                                    <span 
-                                      key={j}
-                                      className={`inline-block w-6 h-6 rounded-full text-xs flex items-center justify-center ${
-                                        answer === questions[j].correctAnswer 
-                                          ? "bg-green-100 text-green-800" 
-                                          : answer === null 
-                                            ? "bg-gray-100 text-gray-800" 
-                                            : "bg-red-100 text-red-800"
-                                      }`}
-                                      title={`P${j + 1}: ${questions[j].text}`}
-                                    >
-                                      {j + 1}
-                                    </span>
-                                  ))}
-                                </div>
-                              </td>
-                            </tr>
-                          );
-                        })}
+                        {dateChartData.map((data, i) => (
+                          <tr key={i}>
+                            <td className="px-6 py-4 whitespace-nowrap">{data.date}</td>
+                            <td className="px-6 py-4 whitespace-nowrap">{data.responses}</td>
+                            <td className="px-6 py-4 whitespace-nowrap">{data.correctRate.toFixed(1)}%</td>
+                            <td className="px-6 py-4 whitespace-nowrap">{data.averageScore.toFixed(1)}%</td>
+                          </tr>
+                        ))}
                       </tbody>
                     </table>
                   </div>
                 </div>
-              )}
-            </div>
-          )}
-
-          {activeTab === "dates" && (
-            <div className="space-y-8">
-              <div className="bg-white p-6 rounded-lg shadow-md">
-                <h2 className="text-xl font-semibold mb-4 text-indigo-700">Rendimiento por fecha</h2>
-                <div className="h-96">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={dateChartData} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="date" />
-                      <YAxis domain={[0, 100]} tickFormatter={(val) => `${val}%`} />
-                      <Tooltip 
-                        formatter={(val: number) => [`${val.toFixed(1)}%`, "Porcentaje de acierto"]}
-                        labelFormatter={(label) => `Fecha: ${label}`}
-                      />
-                      <Legend />
-                      <Line 
-                        type="monotone" 
-                        dataKey="correctRate" 
-                        stroke="#6366f1" 
-                        name="Aciertos por pregunta" 
-                        strokeWidth={2}
-                        dot={{ r: 4 }}
-                      />
-                      <Line 
-                        type="monotone" 
-                        dataKey="averageScore" 
-                        stroke="#82ca9d" 
-                        name="Puntaje promedio" 
-                        strokeWidth={2}
-                        dot={{ r: 4 }}
-                      />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </div>
               </div>
-
-              <div className="bg-white p-6 rounded-lg shadow-md">
-                <h2 className="text-xl font-semibold mb-4 text-indigo-700">Detalle por fecha</h2>
-                <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
-                      <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Respuestas</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aciertos por pregunta</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Puntaje promedio</th>
-                      </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                      {dateChartData.map((data, i) => (
-                        <tr key={i}>
-                          <td className="px-6 py-4 whitespace-nowrap">{data.date}</td>
-                          <td className="px-6 py-4 whitespace-nowrap">{data.responses}</td>
-                          <td className="px-6 py-4 whitespace-nowrap">{data.correctRate.toFixed(1)}%</td>
-                          <td className="px-6 py-4 whitespace-nowrap">{data.averageScore.toFixed(1)}%</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          )}
-        </>
-      )}
-    </div>
-   </>
+            )}
+          </>
+        )}
+      </div>
+    </>
   );
 }

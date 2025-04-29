@@ -254,6 +254,11 @@ export default function Questionnaire() {
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [answers, setAnswers] = useState<(number | null)[]>(Array(questions.length).fill(null));
   const [isComplete, setIsComplete] = useState(false);
+  const [userData, setUserData] = useState({
+    name: '',
+    age: ''
+  });
+  const [showQuestions, setShowQuestions] = useState(false);
 
   const handleOptionSelect = (optionIndex: number) => {
     setSelectedOption(optionIndex);
@@ -278,7 +283,7 @@ export default function Questionnaire() {
 
   const handleComplete = () => {
     setIsComplete(true);
-    saveResponses(answers);
+    saveResponses(answers, userData.name, parseInt(userData.age));
   };
 
   const resetQuiz = () => {
@@ -286,10 +291,95 @@ export default function Questionnaire() {
     setSelectedOption(null);
     setAnswers(Array(questions.length).fill(null));
     setIsComplete(false);
+    setShowQuestions(false);
+    setUserData({ name: '', age: '' });
+  };
+  
+  const handleUserDataChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setUserData(prev => ({
+      ...prev,
+      [name]: value
+    }));
   };
 
+  const startQuiz = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (userData.name && userData.age) {
+      setShowQuestions(true);
+    }
+  };
+  const handleFinish = () => {
+  localStorage.setItem("questionnaireCompleted", "true");
+};
+  if (!showQuestions) {
+    return (
+      <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="max-w-md w-full bg-white rounded-xl shadow-lg overflow-hidden border border-indigo-100 p-8"
+        >
+          <h1 className="text-3xl font-bold text-indigo-800 mb-6 text-center">Antes de comenzar...</h1>
+          
+          <form onSubmit={startQuiz} className="space-y-6">
+            <div>
+              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+                Nombre (o seudónimo)
+              </label>
+              <input
+                type="text"
+                id="name"
+                name="name"
+                value={userData.name}
+                onChange={handleUserDataChange}
+                required
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
+                placeholder="Ingresa tu nombre"
+              />
+            </div>
+            
+            <div>
+              <label htmlFor="age" className="block text-sm font-medium text-gray-700 mb-1">
+                Edad
+              </label>
+              <select
+                id="age"
+                name="age"
+                value={userData.age}
+                onChange={handleUserDataChange}
+                required
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
+              >
+                <option value="">Selecciona tu edad</option>
+                {[15, 16, 17, 18, 19].map(age => (
+                  <option key={age} value={age}>{age} años</option>
+                ))}
+              </select>
+            </div>
+            
+            <div className="pt-4">
+              <button
+                type="submit"
+                disabled={!userData.name || !userData.age}
+                className={`w-full px-6 py-3 rounded-lg font-medium text-white ${
+                  !userData.name || !userData.age
+                    ? 'bg-gray-400 cursor-not-allowed'
+                    : 'bg-indigo-600 hover:bg-indigo-700'
+                }`}
+              >
+                Comenzar cuestionario
+              </button>
+            </div>
+          </form>
+        </motion.div>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
+     <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -298,6 +388,7 @@ export default function Questionnaire() {
           className="text-center mb-10"
         >
           <h1 className="text-4xl font-bold text-indigo-800 mb-2">Cuestionario sobre Métodos Anticonceptivos</h1>
+          <p className="text-gray-600">Usuario: {userData.name} - Edad: {userData.age} años</p>
         </motion.div>
 
         {!isComplete ? (
@@ -446,7 +537,8 @@ export default function Questionnaire() {
     Reiniciar cuestionario
   </button>
   <Link
-    href="/info"
+    onClick={handleFinish}
+    href="/"
     className="px-6 py-3 bg-gray-300 text-gray-800 rounded-lg font-medium hover:bg-gray-400 transition-colors"
   >
     Siguiente
@@ -454,10 +546,6 @@ export default function Questionnaire() {
 </div>
           </motion.div>
         )}
-
-        {/*<div className="mt-8 text-center text-gray-500 text-sm">
-          <p>Este cuestionario es solo con fines educativos.</p>
-        </div>*/}
       </div>
     </div>
   );

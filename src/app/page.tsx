@@ -121,6 +121,21 @@ export default function HomePage() {
   const [activeSection, setActiveSection] = useState<string>("intro");
   const [activeTab, setActiveTab] = useState<string>("naturales");
   const [expandedIntro, setExpandedIntro] = useState(true);
+  const [showQuestionnaireModal, setShowQuestionnaireModal] = useState(false);
+  const [checkingCompletion, setCheckingCompletion] = useState(true);
+
+  useEffect(() => {
+    const completed = localStorage.getItem("questionnaireCompleted");
+    if (!completed) {
+      setShowQuestionnaireModal(true);
+    }
+    setCheckingCompletion(false); // <- importante
+  }, []);
+
+  const handleCompleteQuestionnaire = () => {
+    localStorage.setItem("questionnaireCompleted", "true");
+    setShowQuestionnaireModal(false);
+  };
 
   const methodTabs = [
     { id: "naturales", label: "Naturales" },
@@ -207,7 +222,6 @@ export default function HomePage() {
       observer.disconnect();
     };
   }, []);
-
   return (
     <main className="relative bg-fixed bg-[url('/bg-pattern.svg')] bg-cover min-h-screen py-20 px-4 md:px-12 text-gray-900">
       <motion.div
@@ -216,14 +230,14 @@ export default function HomePage() {
         transition={{ duration: 1 }}
         className="max-w-5xl mx-auto"
       >
-        <header className="text-center mb-20 opacity-20">
+        <header className={`text-center mb-20 ${showQuestionnaireModal ? "opacity-20" : ""}`}>
           <Image src="/logo.png" alt="Logo" width={180} height={180} className="mx-auto mb-4" />
           <h1 className="text-3xl md:text-6xl font-extrabold text-indigo-800 drop-shadow-sm leading-tight">
             Guía de Métodos Anticonceptivos
           </h1>
         </header>
         
-        <nav className="opacity-20 block md:sticky top-0 z-50 bg-white/80 backdrop-blur-md py-4 mb-12 border-b border-indigo-200 shadow-sm">
+        <nav className={`block md:sticky top-0 z-50 bg-white/80 backdrop-blur-md py-4 mb-12 border-b border-indigo-200 shadow-sm ${showQuestionnaireModal ? "opacity-20" : ""}`}>
           <div className="flex flex-wrap justify-center gap-4">
             {navItems.map(item => (
               <Link
@@ -242,24 +256,27 @@ export default function HomePage() {
         </nav>
         
         {/* Questionnaire Modal */}
+        {showQuestionnaireModal && (
         <AnimatePresence>
-            <motion.div
-              initial={{ opacity: 0, y: -50 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -50 }}
-              transition={{ duration: 0.3 }}
-              className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 bg-white p-6 rounded-xl shadow-xl border border-indigo-300 max-w-md w-full"
-            >
-              <div className="flex justify-between items-start mb-4">
-                <h3 className="text-xl font-bold text-indigo-800">Cuestionario Inicial</h3>
-              </div>
-              <p className="mb-4">Por favor complete este breve cuestionario para ayudarnos a personalizar su experiencia.</p>
-              <Link href="/cuestionario">
-                <Button className="w-full">Ir al Cuestionario</Button>
-              </Link>
-            </motion.div>
+          <motion.div
+            initial={{ opacity: 0, y: -50 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -50 }}
+            transition={{ duration: 0.3 }}
+            className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 bg-white p-6 rounded-xl shadow-xl border border-indigo-300 max-w-md w-full"
+          >
+            <div className="flex justify-between items-start mb-4">
+              <h3 className="text-xl font-bold text-indigo-800">Cuestionario Inicial</h3>
+            </div>
+            <p className="mb-4">Por favor complete este breve cuestionario para ayudarnos a personalizar su experiencia.</p>
+            <Link href="/cuestionario">
+              <Button className="w-full">Ir al Cuestionario</Button>
+            </Link>
+          </motion.div>
         </AnimatePresence>
-        <div className="space-y-32 opacity-20">
+      )}
+
+        <div className={`space-y-32 ${showQuestionnaireModal ? 'opacity-0': ''}`}>
           {/* Introduction Section */}
           <section id="intro" className="scroll-mt-32">
             <Section

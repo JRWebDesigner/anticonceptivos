@@ -684,7 +684,7 @@ export default function StatsDashboard() {
     <>
       <header className='block md:sticky top-0 z-50 bg-white/80 backdrop-blur-md py-4 mb-12 border-b border-indigo-200 shadow-sm'>
         <nav className='flex flex-wrap justify-center gap-4'>
-          <Link className='px-4 py-2 rounded-lg transition font-semibold bg-indigo-100 hover:bg-indigo-200 text-indigo-800' href='/info'>Inicio</Link>
+          <Link className='px-4 py-2 rounded-lg transition font-semibold bg-indigo-100 hover:bg-indigo-200 text-indigo-800' href='/'>Inicio</Link>
           <Link className='px-4 py-2 rounded-lg transition font-semibold bg-indigo-100 hover:bg-indigo-200 text-indigo-800' href='/cuestionario'>Cuestionario</Link>
           <Link className='px-4 py-2 rounded-lg transition font-semibold bg-indigo-100 hover:bg-indigo-200 text-indigo-800' href='/estadisticas'>Estadísticas</Link>
         </nav>

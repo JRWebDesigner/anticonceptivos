@@ -122,20 +122,13 @@ export default function HomePage() {
   const [activeTab, setActiveTab] = useState<string>("naturales");
   const [expandedIntro, setExpandedIntro] = useState(true);
   const [showQuestionnaireModal, setShowQuestionnaireModal] = useState(false);
-  const [checkingCompletion, setCheckingCompletion] = useState(true);
 
   useEffect(() => {
     const completed = localStorage.getItem("questionnaireCompleted");
     if (!completed) {
       setShowQuestionnaireModal(true);
     }
-    setCheckingCompletion(false); // <- importante
   }, []);
-
-  const handleCompleteQuestionnaire = () => {
-    localStorage.setItem("questionnaireCompleted", "true");
-    setShowQuestionnaireModal(false);
-  };
 
   const methodTabs = [
     { id: "naturales", label: "Naturales" },

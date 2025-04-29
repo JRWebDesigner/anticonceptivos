@@ -416,26 +416,49 @@ export default function StatsDashboard() {
 
   // Estadísticas por edad
   const ageStats = responses.reduce((acc, response) => {
-    const age = response.userAge;
-    if (!acc[age]) acc[age] = { correct: 0, total: 0, count: 0, users: new Set() };
-    
-    acc[age].users.add(response.userId);
-    
-    const correctAnswers = response.answers.reduce((sum, answer, i) => {
-      if (answer !== null) {
-        acc[age].total++;
-        if (answer === questions[i].correctAnswer) {
-          return sum + 1;
+        // 1. Manejo seguro de la edad (asumiendo que userAge es number)
+        const age = typeof response.userAge === 'number' ? response.userAge : 0;
+        
+        // 2. Inicialización del registro por edad
+        if (!acc[age]) {
+            acc[age] = {
+                correct: 0,
+                total: 0,
+                count: 0,
+                users: new Set<string>() // Set explícitamente tipado como string
+            };
         }
-      }
-      return sum;
-    }, 0);
-    
-    acc[age].correct += correctAnswers;
-    acc[age].count++;
-    return acc;
-  }, {} as Record<number, { correct: number; total: number; count: number; users: Set<string> }>);
 
+        // 3. Validación segura del userId antes de agregarlo
+        if (response.userId && typeof response.userId === 'string') {
+            acc[age].users.add(response.userId);
+        } else {
+            console.warn(`UserId inválido o faltante en respuesta para edad ${age}`);
+            // Opcional: return acc; si quieres omitir respuestas sin userId válido
+        }
+
+        // 4. Cálculo de respuestas correctas con protección de índice
+        const correctAnswers = response.answers.reduce((sum, answer, i) => {
+            if (answer !== null && questions[i]) { // Verifica que la pregunta exista
+                acc[age].total++;
+                if (answer === questions[i].correctAnswer) {
+                    return sum + 1;
+                }
+            }
+            return sum;
+        }, 0);
+
+        // 5. Actualización de estadísticas
+        acc[age].correct += correctAnswers;
+        acc[age].count++;
+
+        return acc;
+    }, {} as Record<number, {
+        correct: number;
+        total: number;
+        count: number;
+        users: Set<string>;
+    }>);
   const ageChartData = Object.entries(ageStats).map(([age, stats]) => ({
     age: `${age} años`,
     correctRate: stats.total ? (stats.correct / stats.total) * 100 : 0,

@@ -247,7 +247,6 @@ export default function HomePage() {
             ))}
           </div>
         </nav>
-        
         {/* Questionnaire Modal */}
         {showQuestionnaireModal && (
         <AnimatePresence>
@@ -283,31 +282,14 @@ export default function HomePage() {
               {expandedIntro && (
                 <div className="mt-4 space-y-4">
                   <p className="mb-4">
-      Según la Organización Mundial de la Salud, el embarazo adolescente es un fenómeno 
-      que ocurre a nivel mundial, con causas que son conocidas y que traen graves consecuencias 
-      para la salud, la sociedad y la economía. El embarazo adolescente es más frecuente en 
-      personas con menor educación o de bajo estatus económico. Esto también puede ser causado 
-      por el matrimonio infantil y el abuso sexual de niñas. Además, está acompañado de los 
-      obstáculos para obtener y usar anticonceptivos que eviten embarazos no deseados.
+      Según la OMS, el embarazo adolescente es un problema global vinculado a factores como pobreza, baja educación, abuso infantil y matrimonio precoz. Estos embarazos tienen consecuencias negativas para la salud, la sociedad y la economía.
     </p>
 
     <p className=" mb-4">
-      De acuerdo con el Sistema Nacional de Información en Salud (SNIS), los indicadores de 
-      embarazos en adolescentes de entre 10 y 19 años registraron una disminución en los 
-      últimos 9 años, observándose lo siguiente:
+      En Bolivia, datos del Sistema Nacional de Información en Salud (SNIS) muestran una disminución sostenida de embarazos en adolescentes de 10 a 19 años.
     </p>
-
-    <ul className="list-disc list-inside space-y-2 mb-6">
-      <li><strong>2015:</strong> 82.416 embarazos</li>
-      <li><strong>2016:</strong> 68.916 embarazos</li>
-      <li><strong>2017:</strong> 60.850 embarazos</li>
-      <li><strong>2018:</strong> 56.910 embarazos</li>
-      <li><strong>2019:</strong> 49.044 embarazos</li>
-      <li><strong>2020:</strong> 39.470 embarazos</li>
-      <li><strong>2021:</strong> 39.747 embarazos</li>
-      <li><strong>2022:</strong> 35.470 embarazos</li>
-      <li><strong>2023:</strong> 32.660 embarazos</li>
-    </ul>
+    
+    <img src='/images/introduccion.jpg' className="w-[360px] h-[350px] mx-auto rounded-3xl" />
 
     <p className="text-gray-700">
       Se registró una disminución del <strong>28.07%</strong> en la gestión 2018 y del <strong>14.28%</strong> hasta la gestión 2023.
@@ -316,9 +298,41 @@ export default function HomePage() {
               )}
             </Section>
           </section>
-
+    <section id="methods" className="flex justify-center items-center gap-6 flex-wrap">
+      {[
+        { href: '/naturales', src: '/images/naturales.jpg', title: 'Métodos Naturales' },
+        { href: '/barrera', src: '/images/barrera.jpg', title: 'Métodos de Barrera' },
+        { href: '/hormonales', src: '/images/hormonales.jpg', title: 'Métodos Hormonales' },
+        { href: '/diu', src: '/images/diu.jpg', title: 'Dispositivos Intrauterinos (DIU)' },
+        { href: '/permanentes', src: '/images/permanentes.jpg', title: 'Métodos Permanentes' },
+      ].map(({ href, src, title }, i) => (
+        <Link key={href} href={href}>
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            whileHover={{ scale: 1.05 }}
+            transition={{ duration: 0.5, delay: i * 0.1 }}
+            viewport={{ once: true }}
+            className="relative w-[300px] h-[300px] rounded-2xl overflow-hidden shadow-xl group cursor-pointer"
+          >
+            <Image
+              src={src}
+              alt={title}
+              fill
+              className="object-cover transition-transform duration-500 group-hover:scale-110"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-blue-600/70 via-pink-500/40 to-transparent" />
+            <div className="absolute bottom-4 left-4 right-4 z-10">
+              <h2 className="text-white text-3xl font-semibold tracking-tight drop-shadow-lg">
+                {title}
+              </h2>
+            </div>
+          </motion.div>
+        </Link>
+      ))}
+    </section>
           {/* Methods Section with Tabs */}
-          <section id="methods" className="scroll-mt-32">
+          <section className="scroll-mt-32">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -434,8 +448,7 @@ export default function HomePage() {
                 </AnimatePresence>
               </div>
             </motion.div>
-          </section>
-
+          </section> 
           {/* Videos Section */}
           <section id="videos" className="scroll-mt-32">
             <motion.div

@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import Link from 'next/link'
@@ -60,8 +60,13 @@ export default function BarreraPage(){
   const [activeTab, setActiveTab] = useState<string>("progestina");
   
    const methodTabs = [
-    { id: "progestuna", label: "Progestina Sola" },
-    { id: "condon-femenino", label: "Condon Femenino" },
+    { id: "progestina", label: "Progestina Sola" },
+    { id: "inyectivos", label: "Inyectivos Combinados" },
+    { id: "anillo", label: "Anillo Vaginal" },
+    { id: "AOC", label: "AOC" },
+    { id: "AOE", label: "AOE" },
+    { id: "PAE", label: "PAE" },
+    PAE
   ];
 
   return(
@@ -228,145 +233,230 @@ export default function BarreraPage(){
                       </>
                     )}
                     
-                    {activeTab === "condon-femenino" && (
+                    {activeTab === "inyectables" && (
                       <>
-                        <h2 className="text-4xl font-bold text-indigo-700 mb-6">CONDÓN FEMENINO</h2>
-                        <Image src="/images/condon-femenino.jpg" alt="Métodos de Barrera" width={500} height={500} className="rounded-xl mb-6 mx-auto" />
+                        <h2 className="text-4xl font-bold text-indigo-700 mb-6">ANTICONCEPTIVOS INYECTABLES COMBINADOS</h2>
+                        <Image src="/images/inyectables.jpg" alt="Métodos de Barrera" width={500} height={500} className="rounded-xl mb-6 mx-auto" />
                         <div className="text-lg leading-relaxed text-gray-800 space-y-4">
-        <section className="mb-8">
-        <h2 className="text-2xl font-semibold mb-3">Descripción</h2>
-        <div className="bg-purple-50 p-4 rounded-lg">
-          <p className="text-gray-700">
-            Es un revestimiento fino de plástico (actualmente existen también de látex) que se adapta a la vagina de la mujer, es flexible y está hecho de una película delgada de plástico suave y transparente (poliuretano).
-          </p>
-          <ul className="list-disc pl-6 mt-3 space-y-1 text-gray-700">
-            <li>Tiene aros flexibles en ambos extremos</li>
-            <li>El aro del extremo cerrado ayuda a la inserción del condón</li>
-            <li>El aro del extremo abierto ayuda a mantener parte del condón fuera de la vagina</li>
-            <li>Protege contra infecciones de transmisión sexual, incluyendo VIH</li>
+        <section className="mb-8 bg-blue-50 p-5 rounded-lg">
+        <h2 className="text-2xl font-semibold mb-3 text-blue-800">DESCRIPCIÓN</h2>
+        <p className="text-gray-700 mb-3">
+          Métodos hormonales que se aplican por inyección mensual. Contienen estrógeno y progestina, similares a las pastillas combinadas. Actúan principalmente inhibiendo la ovulación.
+        </p>
+        
+        <div className="grid md:grid-cols-2 gap-4 mt-4">
+          <div className="bg-white p-4 rounded-lg shadow-sm">
+            <h3 className="font-medium text-blue-700 mb-2">AMP/Cipionato de Estradiol</h3>
+            <p className="text-gray-700">
+              Contiene 25 mg de acetato de medroxiprogesterona de depósito + 5 mg de cipionato de estradiol
+            </p>
+          </div>
+          <div className="bg-white p-4 rounded-lg shadow-sm">
+            <h3 className="font-medium text-blue-700 mb-2">EN-NET/Valerato de Estradiol</h3>
+            <p className="text-gray-700">
+              Contiene 50 mg de enantato de noretisterona + 5 mg de valerato de estradiol
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section className="mb-8">
+        <h2 className="text-2xl font-semibold mb-3 text-blue-800">MÉTODO DE USO</h2>
+        <div className="space-y-4">
+          <div className="flex items-start bg-white p-4 rounded-lg shadow-sm">
+            <div className="flex-shrink-0 h-8 w-8 flex items-center justify-center rounded-full bg-blue-100 text-blue-800 font-medium mr-3 mt-0.5">1</div>
+            <p className="text-gray-700">Inyección intramuscular cada 30 días (preferiblemente el mismo día de cada mes)</p>
+          </div>
+          
+          <div className="flex items-start bg-white p-4 rounded-lg shadow-sm">
+            <div className="flex-shrink-0 h-8 w-8 flex items-center justify-center rounded-full bg-blue-100 text-blue-800 font-medium mr-3 mt-0.5">2</div>
+            <p className="text-gray-700">Se administra en el glúteo o brazo por personal de salud</p>
+          </div>
+          
+          <div className="flex items-start bg-white p-4 rounded-lg shadow-sm">
+            <div className="flex-shrink-0 h-8 w-8 flex items-center justify-center rounded-full bg-blue-100 text-blue-800 font-medium mr-3 mt-0.5">3</div>
+            <p className="text-gray-700">
+              Primera inyección debe aplicarse en los primeros 5 días del ciclo menstrual (si no ha habido relaciones sin protección)
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section className="mb-8">
+        <h2 className="text-2xl font-semibold mb-3 text-blue-800">RECOMENDACIONES</h2>
+        <div className="bg-yellow-50 p-5 rounded-lg border-l-4 border-yellow-400">
+          <ul className="list-disc pl-6 space-y-2 text-gray-700">
+            <li><strong>Aplicar puntualmente cada 30 días:</strong> Si se retrasa más de 3 días, usar método de respaldo (preservativo) por 7 días</li>
+            <li>Realizar controles médicos regulares, especialmente con factores de riesgo cardiovascular</li>
+            <li>No recomendado para mujeres lactantes en los primeros 6 meses postparto</li>
+            <li><strong>No protege</strong> contra infecciones de transmisión sexual</li>
+            <li>Puede causar cambios menstruales (sangrado irregular o amenorrea)</li>
+            <li>Mantener registro de fechas de aplicación</li>
           </ul>
         </div>
       </section>
-      
+
       <section className="mb-8">
-        <h2 className="text-2xl font-semibold mb-3">Eficacia</h2>
-        <div className="grid md:grid-cols-2 gap-4">
-          <div className="bg-blue-50 p-4 rounded-lg">
-            <h3 className="font-medium text-blue-800 mb-1">Uso típico</h3>
-            <p className="text-gray-700">
-              79% efectivo (21 de cada 100 mujeres quedarán embarazadas en un año)
-            </p>
-          </div>
-          <div className="bg-green-50 p-4 rounded-lg">
-            <h3 className="font-medium text-green-800 mb-1">Uso correcto y consistente</h3>
-            <p className="text-gray-700">
-              95% efectivo (5 de cada 100 mujeres quedarán embarazadas en un año)
-            </p>
-          </div>
+        <h2 className="text-2xl font-semibold mb-3 text-blue-800">EFICACIA</h2>
+        <div className="bg-green-50 p-5 rounded-lg">
+          <p className="text-gray-700 mb-3">
+            <strong>99% efectivo</strong> con uso perfecto (1 embarazo por cada 100 mujeres al año)
+          </p>
+          <p className="text-gray-700">
+            <strong>97% efectivo</strong> con uso típico (3 embarazos por cada 100 mujeres al año)
+          </p>
         </div>
       </section>
-      
+
       <section>
-        <h2 className="text-2xl font-semibold mb-4">Modo de uso</h2>
-        
-        <div className="space-y-5">
-          <div className="flex items-start bg-white p-4 rounded-lg shadow-sm">
-            <div className="flex-shrink-0 h-8 w-8 flex items-center justify-center rounded-full bg-purple-100 text-purple-800 font-medium mr-3 mt-0.5">1</div>
-            <p className="text-gray-700">Practique cómo colocar y retirar el condón antes de usarlo en relaciones sexuales.</p>
+        <h2 className="text-2xl font-semibold mb-3 text-blue-800">EFECTOS SECUNDARIOS</h2>
+        <div className="grid md:grid-cols-2 gap-4">
+          <div className="bg-white p-4 rounded-lg shadow-sm">
+            <h3 className="font-medium text-red-600 mb-2">Comunes</h3>
+            <ul className="list-disc pl-6 space-y-1 text-gray-700">
+              <li>Cambios en el sangrado menstrual</li>
+              <li>Dolor de cabeza</li>
+              <li>Náuseas</li>
+              <li>Aumento de peso (2-4 kg promedio al año)</li>
+              <li>Sensibilidad mamaria</li>
+            </ul>
           </div>
-          
-          <div className="flex items-start bg-white p-4 rounded-lg shadow-sm">
-            <div className="flex-shrink-0 h-8 w-8 flex items-center justify-center rounded-full bg-purple-100 text-purple-800 font-medium mr-3 mt-0.5">2</div>
-            <div>
-              <p className="text-gray-700">Verifique la integridad del condón:</p>
-              <ul className="list-disc pl-6 mt-2 text-gray-600">
-                <li>Sienta el colchón de aire al presionar el envase</li>
-                <li>Revise la fecha de vencimiento</li>
-                <li>No lo use si el sobre está roto o el condón parece dañado</li>
-              </ul>
-            </div>
+          <div className="bg-white p-4 rounded-lg shadow-sm">
+            <h3 className="font-medium text-red-600 mb-2">Menos comunes</h3>
+            <ul className="list-disc pl-6 space-y-1 text-gray-700">
+              <li>Cambios de humor</li>
+              <li>Acné</li>
+              <li>Disminución del deseo sexual</li>
+              <li>Dolor en el sitio de inyección</li>
+            </ul>
           </div>
-          
-          <div className="flex items-start bg-white p-4 rounded-lg shadow-sm">
-            <div className="flex-shrink-0 h-8 w-8 flex items-center justify-center rounded-full bg-purple-100 text-purple-800 font-medium mr-3 mt-0.5">3</div>
-            <p className="text-gray-700">Abra el sobre por la ranura. No use dientes ni objetos punzocortantes que puedan dañarlo.</p>
-          </div>
-          
-          <div className="flex items-start bg-white p-4 rounded-lg shadow-sm">
-            <div className="flex-shrink-0 h-8 w-8 flex items-center justify-center rounded-full bg-purple-100 text-purple-800 font-medium mr-3 mt-0.5">4</div>
-            <div>
-              <p className="text-gray-700">Adopte una posición cómoda para la inserción:</p>
-              <ul className="list-disc pl-6 mt-2 text-gray-600">
-                <li>Parada con un pie en una silla</li>
-                <li>Sentada o acostada con muslos separados</li>
-              </ul>
-            </div>
-          </div>
-          
-          <div className="flex items-start bg-white p-4 rounded-lg shadow-sm">
-            <div className="flex-shrink-0 h-8 w-8 flex items-center justify-center rounded-full bg-purple-100 text-purple-800 font-medium mr-3 mt-0.5">5</div>
-            <div>
-              <p className="text-gray-700">Sostenga el condón correctamente:</p>
-              <ul className="list-disc pl-6 mt-2 text-gray-600">
-                <li>Extremo abierto orientado hacia abajo</li>
-                <li>Tome el anillo interno entre pulgar, índice y medio</li>
-              </ul>
-            </div>
-          </div>
-          
-          <div className="flex items-start bg-white p-4 rounded-lg shadow-sm">
-            <div className="flex-shrink-0 h-8 w-8 flex items-center justify-center rounded-full bg-purple-100 text-purple-800 font-medium mr-3 mt-0.5">6</div>
-            <div>
-              <p className="text-gray-700">Inserción:</p>
-              <ul className="list-disc pl-6 mt-2 text-gray-600">
-                <li>Con una mano separe los labios vaginales</li>
-                <li>Con la otra, inserte parcialmente el condón</li>
-                <li>Empuje el anillo interno hacia arriba y atrás con el dedo índice</li>
-              </ul>
-            </div>
-          </div>
-          
-          <div className="flex items-start bg-white p-4 rounded-lg shadow-sm">
-            <div className="flex-shrink-0 h-8 w-8 flex items-center justify-center rounded-full bg-purple-100 text-purple-800 font-medium mr-3 mt-0.5">7</div>
-            <p className="text-gray-700">Asegúrese que el condón no esté torcido dentro de la vagina. Parte quedará fuera de la vulva.</p>
-          </div>
-          
-          <div className="flex items-start bg-white p-4 rounded-lg shadow-sm">
-            <div className="flex-shrink-0 h-8 w-8 flex items-center justify-center rounded-full bg-purple-100 text-purple-800 font-medium mr-3 mt-0.5">8</div>
-            <p className="text-gray-700">Durante el coito, guíe el pene hacia la entrada de la vagina cubierta por el condón.</p>
-          </div>
-          
-          <div className="flex items-start bg-white p-4 rounded-lg shadow-sm">
-            <div className="flex-shrink-0 h-8 w-8 flex items-center justify-center rounded-full bg-purple-100 text-purple-800 font-medium mr-3 mt-0.5">9</div>
-            <p className="text-gray-700">Puede colocarse hasta 8 horas antes de la relación y no necesita removerse inmediatamente después.</p>
-          </div>
-          
-          <div className="flex items-start bg-white p-4 rounded-lg shadow-sm">
-            <div className="flex-shrink-0 h-8 w-8 flex items-center justify-center rounded-full bg-purple-100 text-purple-800 font-medium mr-3 mt-0.5">10</div>
-            <div>
-              <p className="text-gray-700">Para retirar:</p>
-              <ul className="list-disc pl-6 mt-2 text-gray-600">
-                <li>Apriete y gire el borde externo</li>
-                <li>Esto mantiene el semen dentro</li>
-                <li>Retire suavemente</li>
-              </ul>
-            </div>
-          </div>
-          
-          <div className="flex items-start bg-white p-4 rounded-lg shadow-sm">
-            <div className="flex-shrink-0 h-8 w-8 flex items-center justify-center rounded-full bg-purple-100 text-purple-800 font-medium mr-3 mt-0.5">11</div>
-            <div>
-              <p className="text-gray-700">Deseche adecuadamente:</p>
-              <ul className="list-disc pl-6 mt-2 text-gray-600">
-                <li>En un lugar seguro donde otros no lo manipulen</li>
-                <li>Use uno nuevo en cada relación coital vaginal</li>
-              </ul>
-            </div>
-          </div>
+        </div>
+
+        <div className="mt-6 p-4 bg-purple-50 border-l-4 border-purple-400">
+          <h3 className="text-lg font-medium text-purple-800 mb-2">Ventajas</h3>
+          <ul className="list-disc pl-6 space-y-1 text-purple-700">
+            <li>Sólo requiere atención mensual</li>
+            <li>No interfiere con la relación sexual</li>
+            <li>Efectivo inmediatamente si se inicia correctamente</li>
+            <li>Discreto (no requiere almacenamiento en casa)</li>
+          </ul>
         </div>
       </section>
       <div className='w-[60%] mx-auto'>
-      <VideoCard  title="" src="https://www.youtube.com/embed/diTuNr0kQHk" />
+      <VideoCard  title="" src="https://www.youtube.com/embed/SqG7j8c-7zc " />
+    </div>
+                        </div>
+                      </>
+                    )}
+                    {activeTab === "anillos" && (
+                      <>
+                        <h2 className="text-4xl font-bold text-indigo-700 mb-6">ANILLO VAGINAL</h2>
+                        <Image src="/images/inyectables.jpg" alt="Métodos de Barrera" width={500} height={500} className="rounded-xl mb-6 mx-auto" />
+                        <div className="text-lg leading-relaxed text-gray-800 space-y-4">
+        <section className="mb-8">
+        <h2 className="text-2xl font-semibold mb-3">DESCRIPCIÓN</h2>
+        <div className="bg-pink-50 p-4 rounded-lg">
+          <p className="text-gray-700">
+            Se trata de un anillo flexible que se coloca en la vagina. Libera dos hormonas de forma continua, una progestina y un estrógeno. Funciona fundamentalmente evitando la liberación de óvulos desde los ovarios.
+          </p>
+        </div>
+      </section>
+
+      <section className="mb-8">
+        <h2 className="text-2xl font-semibold mb-3">MÉTODO DE USO</h2>
+        <div className="space-y-4">
+          <div className="flex items-start bg-white p-4 rounded-lg shadow-sm">
+            <div className="flex-shrink-0 h-8 w-8 flex items-center justify-center rounded-full bg-pink-100 text-pink-800 font-medium mr-3 mt-0.5">1</div>
+            <p className="text-gray-700">No importa la posición exacta, pero si se inserta bien profundo ayuda a que quede en su lugar y tiene menos probabilidades de sentirlo.</p>
+          </div>
+          
+          <div className="flex items-start bg-white p-4 rounded-lg shadow-sm">
+            <div className="flex-shrink-0 h-8 w-8 flex items-center justify-center rounded-full bg-pink-100 text-pink-800 font-medium mr-3 mt-0.5">2</div>
+            <p className="text-gray-700">Los músculos de la vagina mantienen naturalmente el anillo en su lugar.</p>
+          </div>
+          
+          <div className="flex items-start bg-white p-4 rounded-lg shadow-sm">
+            <div className="flex-shrink-0 h-8 w-8 flex items-center justify-center rounded-full bg-pink-100 text-pink-800 font-medium mr-3 mt-0.5">3</div>
+            <p className="text-gray-700">
+              Se mantiene el anillo colocado durante tres semanas, luego de lo cual se retira a la cuarta semana. Durante esta cuarta semana la mujer tendrá su menstruación.
+            </p>
+          </div>
+
+          <div className="flex items-start bg-white p-4 rounded-lg shadow-sm">
+            <div className="flex-shrink-0 h-8 w-8 flex items-center justify-center rounded-full bg-pink-100 text-pink-800 font-medium mr-3 mt-0.5">4</div>
+            <p className="text-gray-700">Luego de la cuarta semana se tiene que volver a utilizar el anillo.</p>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2 className="text-2xl font-semibold mb-3">RECOMENDACIONES</h2>
+        <div className="bg-yellow-50 p-4 rounded-lg border-l-4 border-yellow-400">
+          <ul className="list-disc pl-6 space-y-2 text-gray-700">
+            <li>No hay demora en la recuperación de la fertilidad después de dejar de usar el anillo.</li>
+            <li>No brinda ninguna protección contra infecciones de trasmisión sexual (ITS).</li>
+          </ul>
+        </div>
+      </section>
+      <div className='w-[60%] mx-auto'>
+      <VideoCard  title="" src="https://www.youtube.com/embed/msX9BTPLALw" />
+    </div>
+                        </div>
+                      </>
+                    )}
+                    {activeTab === "AOC" && (
+                      <>
+                        <h2 className="text-4xl font-bold text-indigo-700 mb-6">ANTICONCEPTIVOS ORALES COMBINADOS (AOC)</h2>
+                        <Image src="/images/inyectables.jpg" alt="Métodos de Barrera" width={500} height={500} className="rounded-xl mb-6 mx-auto" />
+                        <div className="text-lg leading-relaxed text-gray-800 space-y-4">
+        <section className="mb-8">
+        <h2 className="text-2xl font-semibold mb-3">CÓMO SE USA</h2>
+        <div className="space-y-4">
+          <div className="bg-blue-50 p-4 rounded-lg">
+            <p className="text-gray-700">
+              Pueden entregarse los paquetes de píldoras en cualquier momento, indicando cuándo comenzar a usarlos.
+            </p>
+          </div>
+
+          <div className="flex items-start bg-white p-4 rounded-lg shadow-sm">
+            <div className="flex-shrink-0 h-8 w-8 flex items-center justify-center rounded-full bg-blue-100 text-blue-800 font-medium mr-3 mt-0.5">1</div>
+            <div>
+              <p className="font-medium text-gray-800 mb-1">Presentación de 28 píldoras:</p>
+              <p className="text-gray-700">
+                Se ingiere una píldora con hormonas diariamente durante 21 días consecutivos, seguidos de siete días de píldoras que contienen hierro.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-start bg-white p-4 rounded-lg shadow-sm">
+            <div className="flex-shrink-0 h-8 w-8 flex items-center justify-center rounded-full bg-blue-100 text-blue-800 font-medium mr-3 mt-0.5">2</div>
+            <p className="text-gray-700">
+              Los paquetes siguientes se inician al concluir el previo, independientemente de cuándo se presente el sangrado menstrual.
+            </p>
+          </div>
+
+          <div className="flex items-start bg-white p-4 rounded-lg shadow-sm">
+            <div className="flex-shrink-0 h-8 w-8 flex items-center justify-center rounded-full bg-blue-100 text-blue-800 font-medium mr-3 mt-0.5">3</div>
+            <div>
+              <p className="font-medium text-gray-800 mb-1">Presentación de 21 píldoras:</p>
+              <p className="text-gray-700">
+                Se ingiere una píldora diariamente durante 21 días, seguidos de siete días de descanso. Los paquetes siguientes deben iniciarse al concluir los siete días de descanso del ciclo previo.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2 className="text-2xl font-semibold mb-3">RECOMENDACIONES</h2>
+        <div className="bg-yellow-50 p-4 rounded-lg border-l-4 border-yellow-400">
+          <p className="text-gray-700">
+            La elegibilidad de un método anticonceptivo dependerá de la existencia de alguna condición específica de la usuaria, clasificada por la OMS en categorías que van desde "no hay restricción para el uso" hasta "existe un riesgo inaceptable para la salud cuando se asocia al uso del método".
+          </p>
+        </div>
+      </section>
+      <div className='w-[60%] mx-auto'>
+      <VideoCard  title="" src="https://www.youtube.com/embed/Ihkk-qhacQc" />
     </div>
                         </div>
                       </>

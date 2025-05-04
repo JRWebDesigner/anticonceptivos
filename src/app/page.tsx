@@ -119,7 +119,6 @@ const VideoCard = ({ title, src }: VideoCardProps) => (
 
 export default function HomePage() {
   const [activeSection, setActiveSection] = useState<string>("intro");
-  const [activeTab, setActiveTab] = useState<string>("naturales");
   const [expandedIntro, setExpandedIntro] = useState(true);
   const [showQuestionnaireModal, setShowQuestionnaireModal] = useState(false);
 
@@ -129,15 +128,6 @@ export default function HomePage() {
       setShowQuestionnaireModal(true);
     }
   }, []);
-
-  const methodTabs = [
-    { id: "naturales", label: "Naturales" },
-    { id: "barrera", label: "Barrera" },
-    { id: "hormonales", label: "Hormonales" },
-    { id: "diu", label: "DIU" },
-    { id: "permanentes", label: "Permanentes" },
-  ];
-
   const videos = [
   {
     title: "Métodos Anticonceptivos Naturales",
@@ -331,124 +321,7 @@ export default function HomePage() {
         </Link>
       ))}
     </section>
-          {/* Methods Section with Tabs */}
-          <section className="scroll-mt-32">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1, duration: 0.6 }}
-              viewport={{ once: true }}
-              className="bg-white/90 backdrop-blur-md rounded-xl shadow-lg border border-indigo-200"
-            >
-              <div className="flex overflow-x-auto">
-                {methodTabs.map(tab => (
-                  <Tab
-                    key={tab.id}
-                    label={tab.label}
-                    active={activeTab === tab.id}
-                    onClick={() => setActiveTab(tab.id)}
-                  />
-                ))}
-              </div>
-              
-              <div className="p-8">
-                <AnimatePresence mode="wait">
-                  <motion.div
-                    key={activeTab}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    {activeTab === "naturales" && (
-                      <>
-                        <h2 className="text-4xl font-bold text-indigo-700 mb-6">Métodos Naturales</h2>
-                        <Image src="/images/naturales.jpg" alt="Métodos Naturales" width={1000} height={500} className="rounded-xl mb-6" />
-                        <div className="text-lg leading-relaxed text-gray-800 space-y-4">
-                          <p>Estos métodos se basan en la observación y comprensión del ciclo menstrual para identificar los días fértiles y evitar relaciones sexuales en esos períodos. Requieren disciplina y conocimiento del cuerpo.</p>
-                          <ul className="list-disc list-inside space-y-1">
-                            <li><strong>Método de la Amenorrea por Lactancia (MELA):</strong> Utiliza la lactancia exclusiva como método anticonceptivo durante los primeros seis meses posparto. Tiene una eficacia del 98% cuando se aplica correctamente.</li>
-                            <li><strong>Método del Ritmo o Calendario:</strong> Consiste en calcular los días fértiles basándose en la duración de ciclos menstruales anteriores. Tiene una eficacia aproximada del 76%.</li>
-                            <li><strong>Temperatura Basal Corporal:</strong> Implica medir la temperatura corporal cada mañana antes de levantarse para detectar el aumento que indica ovulación. Es más eficaz cuando se combina con otros métodos naturales.</li>
-                            <li><strong>Método del Moco Cervical (Billings):</strong> Se basa en observar los cambios en el moco cervical para identificar la ovulación.</li>
-                            <li><strong>Método Sintotérmico:</strong> Combina la observación de la temperatura basal, el moco cervical y otros signos físicos para determinar los días fértiles. Es uno de los métodos naturales más fiables.</li>
-                            <li><strong>Método del Retiro (Coitus Interruptus):</strong> Consiste en retirar el pene de la vagina antes de la eyaculación. Tiene una eficacia del 78% en uso típico.</li>
-                          </ul>
-                          <p className="text-red-600">Nota: Estos métodos no protegen contra infecciones de transmisión sexual (ITS) y requieren compromiso y educación adecuada para su efectividad.</p>
-                        </div>
-                      </>
-                    )}
-                    
-                    {activeTab === "barrera" && (
-                      <>
-                        <h2 className="text-4xl font-bold text-indigo-700 mb-6">Métodos de Barrera</h2>
-                        <Image src="/images/barrera.jpg" alt="Métodos de Barrera" width={1000} height={500} className="rounded-xl mb-6" />
-                        <div className="text-lg leading-relaxed text-gray-800 space-y-4">
-                          <p>Estos métodos impiden físicamente que los espermatozoides lleguen al óvulo. Algunos también ofrecen protección contra ITS.</p>
-                          <ul className="list-disc list-inside space-y-1">
-                            <li><strong>Condón Masculino:</strong> Funda delgada que se coloca sobre el pene erecto. Eficacia del 85% en uso típico. Protege contra ITS.</li>
-                            <li><strong>Condón Femenino:</strong> Funda que se inserta en la vagina antes del coito. Eficacia del 79%. También protege contra ITS.</li>
-                            <li><strong>Diafragma:</strong> Copa flexible que se inserta en la vagina para cubrir el cuello uterino. Eficacia del 88% cuando se usa con espermicida.</li>
-                            <li><strong>Capuchón Cervical:</strong> Similar al diafragma pero más pequeño. Eficacia entre 71% y 86%, dependiendo de si la mujer ha tenido partos.</li>
-                            <li><strong>Esponja Anticonceptiva:</strong> Esponja suave impregnada con espermicida que se coloca en la vagina. Eficacia del 76% al 88%.</li>
-                            <li><strong>Espermicidas:</strong> Sustancias químicas que inmovilizan o matan espermatozoides. Eficacia del 72% cuando se usan solos; se recomienda combinarlos con otros métodos de barrera.</li>
-                          </ul>
-                          <p className="text-red-600">Errores frecuentes: Muchos piensan que todos los anticonceptivos previenen ITS, pero solo los métodos de barrera ofrecen esta protección.</p>
-                        </div>
-                      </>
-                    )}
-                    
-                    {activeTab === "hormonales" && (
-                      <>
-                        <h2 className="text-4xl font-bold text-indigo-700 mb-6">Métodos Hormonales</h2>
-                        <Image src="/images/hormonales.jpg" alt="Métodos Hormonales" width={1000} height={500} className="rounded-xl mb-6" />
-                        <div className="text-lg leading-relaxed text-gray-800 space-y-4">
-                          <p>Los métodos anticonceptivos hormonales utilizan hormonas sintéticas para prevenir el embarazo. Estos métodos pueden contener una combinación de estrógeno y progestina o solo progestina, y actúan principalmente inhibiendo la ovulación, espesando el moco cervical y alterando el endometrio para evitar la implantación.</p>
-                          <ul className="list-disc list-inside space-y-1">
-                            <li><strong>Píldoras Anticonceptivas Combinadas:</strong> Contienen estrógeno y progestina. Uso diario durante 21 días, seguidos de 7 días de descanso o placebo. Más del 99% de eficacia con uso correcto.</li>
-                            <li><strong>Minipíldora (Progestina sola):</strong> Solo progestina. Uso diario a la misma hora sin interrupciones. 99% de eficacia. Apta durante la lactancia.</li>
-                            <li><strong>Parche Anticonceptivo:</strong> Parche transdérmico que libera hormonas. Se aplica semanalmente por tres semanas, con una semana de descanso. Aproximadamente 99% eficaz.</li>
-                            <li><strong>Anillo Vaginal:</strong> Anillo flexible insertado en la vagina por tres semanas. Libera hormonas. 99% de eficacia.</li>
-                            <li><strong>Inyecciones Anticonceptivas:</strong> Inyecciones de progestina aplicadas cada 8 a 12 semanas por personal médico. Más del 99% de eficacia.</li>
-                            <li><strong>Implante Subdérmico:</strong> Pequeña varilla colocada bajo la piel del brazo. Libera progestina por 3 a 5 años. Eficacia cercana al 99.95%.</li>
-                          </ul>
-                          <p className="text-red-600">Consideraciones: No protegen contra ITS. Algunos métodos pueden causar efectos secundarios hormonales o aumento del riesgo de trombosis. Consulta médica recomendada.</p>
-                        </div>
-                      </>
-                    )}
-                    
-                    {activeTab === "diu" && (
-                      <>
-                        <h2 className="text-4xl font-bold text-indigo-700 mb-6">Dispositivos Intrauterinos (DIU)</h2>
-                        <Image src="/images/diu.jpg" alt="DIU" width={1000} height={500} className="rounded-xl mb-6" />
-                        <div className="text-lg leading-relaxed text-gray-800 space-y-4">
-                          <ul className="list-disc list-inside space-y-1">
-                            <li><strong>DIU de Cobre:</strong> Dispositivo plástico en forma de T recubierto de cobre. Funciona como espermicida. Dura hasta 10 años. Más del 99% de eficacia.</li>
-                            <li><strong>DIU Hormonal:</strong> Libera una pequeña cantidad de progestina en el útero. Espesa el moco cervical, inhibe la ovulación. Dura de 3 a 8 años. 99% de eficacia.</li>
-                          </ul>
-                          <p className="text-red-600">Ventajas: Alta eficacia, larga duración, reversibilidad rápida. No protegen contra ITS. El de cobre puede aumentar el sangrado los primeros meses.</p>
-                        </div>
-                      </>
-                    )}
-                    
-                    {activeTab === "permanentes" && (
-                      <>
-                        <h2 className="text-4xl font-bold text-indigo-700 mb-6">Métodos Permanentes</h2>
-                        <Image src="/images/permanentes.jpg" alt="Métodos Permanentes" width={1000} height={500} className="rounded-xl mb-6" />
-                        <div className="text-lg leading-relaxed text-gray-800 space-y-4">
-                          <ul className="list-disc list-inside space-y-1">
-                            <li><strong>Ligadura de Trompas:</strong> Procedimiento quirúrgico para bloquear trompas de Falopio. Más del 99% de eficacia. Procedimiento ambulatorio.</li>
-                            <li><strong>Vasectomía:</strong> Procedimiento quirúrgico que bloquea conductos deferentes. Casi 100% eficaz. Ambulatorio, 20 minutos de duración.</li>
-                          </ul>
-                          <p className="text-red-600">Ventajas: Permanentes, sin mantenimiento continuo, no afectan relaciones sexuales. Riesgos quirúrgicos y no protegen contra ITS. Reversibilidad no siempre garantizada.</p>
-                        </div>
-                      </>
-                    )}
-                  </motion.div>
-                </AnimatePresence>
-              </div>
-            </motion.div>
-          </section> 
+          
           {/* Videos Section */}
           <section id="videos" className="scroll-mt-32">
             <motion.div

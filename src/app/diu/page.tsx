@@ -173,7 +173,7 @@ export default function DiuPage(){
               <section className="mb-8 bg-pink-50 p-5 rounded-lg">
         <h2 className="text-2xl font-semibold mb-3 text-pink-800">DESCRIPCIÓN</h2>
         <p className="text-gray-700 mb-3">
-          El dispositivo intrauterino de levonorgestrel (DIU-LNG) es un dispositivo plástico en forma de "T" que libera constantemente pequeñas cantidades de levonorgestrel cada día (levonorgestrel es una progestina ampliamente utilizada en implantes y anticonceptivos orales).
+          El dispositivo intrauterino de levonorgestrel (DIU-LNG) es un dispositivo plástico en forma de &quot;T&quot; que libera constantemente pequeñas cantidades de levonorgestrel cada día (levonorgestrel es una progestina ampliamente utilizada en implantes y anticonceptivos orales).
         </p>
         <p className="text-gray-700">
           Funciona fundamentalmente evitando la proliferación del revestimiento del útero (endometrio).

@@ -140,7 +140,7 @@ export default function BarreraPage(){
           <li>No contienen estrógeno</li>
           <li>Pueden utilizarse durante la lactancia</li>
           <li>Aptas para mujeres que no pueden usar métodos con estrógeno</li>
-          <li>También conocidas como "minipíldoras" o AOP (Anticonceptivos Orales de Progestina sola)</li>
+          <li>También conocidas como &quot;minipíldoras&quot; o AOP (Anticonceptivos Orales de Progestina sola)</li>
         </ul>
       </section>
       
@@ -450,7 +450,7 @@ export default function BarreraPage(){
         <h2 className="text-2xl font-semibold mb-3">RECOMENDACIONES</h2>
         <div className="bg-yellow-50 p-4 rounded-lg border-l-4 border-yellow-400">
           <p className="text-gray-700">
-            La elegibilidad de un método anticonceptivo dependerá de la existencia de alguna condición específica de la usuaria, clasificada por la OMS en categorías que van desde "no hay restricción para el uso" hasta "existe un riesgo inaceptable para la salud cuando se asocia al uso del método".
+            La elegibilidad de un método anticonceptivo dependerá de la existencia de alguna condición específica de la usuaria, clasificada por la OMS en categorías que van desde &quot;no hay restricción para el uso&quot; hasta &quot;existe un riesgo inaceptable para la salud cuando se asocia al uso del método&quot;.
           </p>
         </div>
       </section>
@@ -514,7 +514,7 @@ PÍLDORA ANTICONCEPTIVA DE EMERGENCIA
                     )}
                       {activeTab === "PAE" && (
                       <>
-                        <h2 className="text-4xl font-bold text-indigo-700 mb-6">PÍLDORA ANTICONCEPTIVA DE EMERGENCIA (PAE), A VECES LLAMADA PÍLDORA "DEL DÍA DESPUÉS", "DE LA MAÑANA SIGUIENTE" O ANTICONCEPTIVOS POSTCOITALES.</h2>
+                        <h2 className="text-4xl font-bold text-indigo-700 mb-6">PÍLDORA ANTICONCEPTIVA DE EMERGENCIA (PAE), A VECES LLAMADA PÍLDORA &quot;DEL DÍA DESPUÉS&quot;, &quot;DE LA MAÑANA SIGUIENTE&quot; O ANTICONCEPTIVOS POSTCOITALES.</h2>
                         <Image src="/images/pae.jpg" alt="Métodos de Barrera" width={500} height={500} className="rounded-xl mb-6 mx-auto" />
                         <div className="text-lg leading-relaxed text-gray-800 space-y-4">
         <div className="max-w-3xl mx-auto p-6">

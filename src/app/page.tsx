@@ -26,7 +26,6 @@ interface NavItem {
 const navItems: NavItem[] = [
   { title: "Introducción", id: "intro" },
   { title: "Métodos", id: "methods" },
-  { title: "Videos", id: "videos" },
   { title: "Cuestionario", id: "questionnaire" },
 ];
 
@@ -78,47 +77,7 @@ function Section({ title, image, delay, children, id, isExpanded = true, onToggl
   );
 }
 
-interface TabProps {
-  label: string;
-  active: boolean;
-  onClick: () => void;
-}
-
-const Tab = ({ label, active, onClick }: TabProps) => (
-  <button
-    onClick={onClick}
-    className={`px-6 py-3 font-medium rounded-t-lg transition-colors ${
-      active ? 'bg-white text-indigo-700 border-t-2 border-l-2 border-r-2 border-indigo-300' : 'bg-indigo-100 text-indigo-800 hover:bg-indigo-200'
-    }`}
-  >
-    {label}
-  </button>
-);
-
-interface VideoCardProps {
-  title: string;
-  src: string;
-}
-
-const VideoCard = ({ title, src }: VideoCardProps) => (
-  <div className="bg-white rounded-lg shadow-md overflow-hidden border border-indigo-200">
-    <div className="aspect-w-16 aspect-h-9">
-      <iframe
-        src={src}
-        title={title}
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-        allowFullScreen
-        className="w-full h-64"
-      ></iframe>
-    </div>
-    <div className="p-4">
-      <h3 className="text-lg font-semibold text-indigo-800">{title}</h3>
-    </div>
-  </div>
-);
-
 export default function HomePage() {
-  const [activeSection, setActiveSection] = useState<string>("intro");
   const [expandedIntro, setExpandedIntro] = useState(true);
   const [showQuestionnaireModal, setShowQuestionnaireModal] = useState(false);
 
@@ -128,28 +87,7 @@ export default function HomePage() {
       setShowQuestionnaireModal(true);
     }
   }, []);
-  const videos = [
-  {
-    title: "Métodos Anticonceptivos Naturales",
-    src: "https://www.youtube.com/embed/_5s5dN5-LPI"
-  },
-  {
-    title: "Métodos de Barrera",
-    src: "https://www.youtube.com/embed/SBXwN1RSoXE"
-  },
-  {
-    title: "Métodos Hormonales",
-    src: "https://www.youtube.com/embed/cTLhUk7BlEA"
-  },
-  {
-    title: "Métodos Hormonales",
-    src: "https://www.youtube.com/embed/SqG7j8c-7zc"
-  },
-  {
-    title: "Métodos DIU",
-    src: "https://www.youtube.com/embed/AeIa0-odX6M"
-  }
-];
+  
 
   useEffect(() => {
     const links = document.querySelectorAll<HTMLAnchorElement>('a[href^="#"]');
@@ -321,24 +259,6 @@ export default function HomePage() {
         </Link>
       ))}
     </section>
-          
-          {/* Videos Section */}
-          <section id="videos" className="scroll-mt-32">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.15, duration: 0.6 }}
-              viewport={{ once: true }}
-              className="bg-white/90 backdrop-blur-md p-8 rounded-xl shadow-lg border border-indigo-200"
-            >
-              <h2 className="text-4xl font-bold text-indigo-700 mb-6">Videos Educativos</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {videos.map((video, index) => (
-                  <VideoCard key={index} title={video.title} src={video.src} />
-                ))}
-              </div>
-            </motion.div>
-          </section>
 
           {/* Questionnaire Section */}
           <section id="questionnaire" className="scroll-mt-32">

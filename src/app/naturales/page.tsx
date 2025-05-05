@@ -220,7 +220,7 @@ export default function NatPage(){
         <div className="mb-6">
           <h3 className="text-xl font-medium mb-2 text-blue-600">Periodo fértil</h3>
           <p className="text-gray-700">
-            Los niveles de estrógeno aumentan, comienza a aparecer una pequeña cantidad de moco en la vagina. Inicialmente es escaso, y la mujer puede sentir algo de humedad o pegajosidad en la vulva. A medida que se acerca la ovulación, el moco se vuelve más elástico, transparente, delgado y similar a la clara de huevo. Es una señal de fertilidad, y el último día en que se observa este tipo de moco se conoce como el "día pico" del moco cervical.
+            Los niveles de estrógeno aumentan, comienza a aparecer una pequeña cantidad de moco en la vagina. Inicialmente es escaso, y la mujer puede sentir algo de humedad o pegajosidad en la vulva. A medida que se acerca la ovulación, el moco se vuelve más elástico, transparente, delgado y similar a la clara de huevo. Es una señal de fertilidad, y el último día en que se observa este tipo de moco se conoce como el &quot;día pico&quot; del moco cervical.
           </p>
         </div>
         
@@ -236,7 +236,7 @@ export default function NatPage(){
         <h2 className="text-2xl font-semibold mb-3">Modo de uso</h2>
         <ul className="list-disc pl-6 space-y-3 text-gray-700">
           <li>Durante el periodo infértil, al inicio del ciclo menstrual, la pareja puede tener relaciones sexuales sin riesgo de embarazo.</li>
-          <li>Durante el periodo fértil, la pareja debe evitar tener relaciones sexuales vaginales y, si lo desean, usar un método de barrera hasta al menos cuatro días después del "día pico" del moco cervical.</li>
+          <li>Durante el periodo fértil, la pareja debe evitar tener relaciones sexuales vaginales y, si lo desean, usar un método de barrera hasta al menos cuatro días después del &quot;día pico&quot; del moco cervical.</li>
           <li>En el periodo infértil, al final del ciclo menstrual, la pareja puede tener relaciones sexuales sin precaución hasta que inicie el sangrado menstrual nuevamente.</li>
           <li>Se recomienda evitar las relaciones sexuales sin protección durante la menstruación, ya que puede ser difícil identificar claramente el moco cervical. Sin embargo, las probabilidades de embarazo durante los primeros 5-6 días del ciclo son mínimas.</li>
           <li>Una vez que termina la menstruación y la mujer no presenta flujo durante varios días, generalmente el coito vaginal se considera seguro.</li>

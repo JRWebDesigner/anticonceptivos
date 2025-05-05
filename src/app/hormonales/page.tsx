@@ -61,12 +61,11 @@ export default function BarreraPage(){
   
    const methodTabs = [
     { id: "progestina", label: "Progestina Sola" },
-    { id: "inyectivos", label: "Inyectivos Combinados" },
+    { id: "inyectables", label: "Inyectables Combinados" },
     { id: "anillo", label: "Anillo Vaginal" },
     { id: "AOC", label: "AOC" },
     { id: "AOE", label: "AOE" },
     { id: "PAE", label: "PAE" },
-    PAE
   ];
 
   return(
@@ -348,7 +347,7 @@ export default function BarreraPage(){
                         </div>
                       </>
                     )}
-                    {activeTab === "anillos" && (
+                    {activeTab === "anillo" && (
                       <>
                         <h2 className="text-4xl font-bold text-indigo-700 mb-6">ANILLO VAGINAL</h2>
                         <Image src="/images/inyectables.jpg" alt="Métodos de Barrera" width={500} height={500} className="rounded-xl mb-6 mx-auto" />
@@ -457,6 +456,117 @@ export default function BarreraPage(){
       </section>
       <div className='w-[60%] mx-auto'>
       <VideoCard  title="" src="https://www.youtube.com/embed/Ihkk-qhacQc" />
+    </div>
+                        </div>
+                      </>
+                    )}
+                      {activeTab === "AOE" && (
+                      <>
+                        <h2 className="text-4xl font-bold text-indigo-700 mb-6">ANTICONCEPCIÓN ORAL DE EMERGENCIA (AOE)
+PÍLDORA ANTICONCEPTIVA DE EMERGENCIA
+</h2>
+                        <Image src="/images/aoe.jpg" alt="Métodos de Barrera" width={500} height={500} className="rounded-xl mb-6 mx-auto" />
+                        <div className="text-lg leading-relaxed text-gray-800 space-y-4">
+       <section className="mb-8 bg-blue-50 p-5 rounded-lg">
+        <h2 className="text-2xl font-semibold mb-3 text-blue-800">COMPOSICIÓN</h2>
+        <p className="text-gray-700 mb-3">
+          Las PAE contienen sólo progestina (Levonorgestrel), o una progestina y un estrógeno juntos.
+        </p>
+      </section>
+
+      <section className="mb-8">
+        <h2 className="text-2xl font-semibold mb-3 text-blue-800">MECANISMO DE ACCIÓN DEL LEVONORGESTREL</h2>
+        <div className="space-y-4">
+          <div className="flex items-start bg-white p-4 rounded-lg shadow-sm">
+            <div className="flex-shrink-0 h-8 w-8 flex items-center justify-center rounded-full bg-blue-100 text-blue-800 font-medium mr-3 mt-0.5">1</div>
+            <p className="text-gray-700">
+              El levonorgestrel es un análogo de la progesterona y tiene los mismos efectos que esta hormona, incluyendo la capacidad de mantener el embarazo.
+            </p>
+          </div>
+          
+          <div className="flex items-start bg-white p-4 rounded-lg shadow-sm">
+            <div className="flex-shrink-0 h-8 w-8 flex items-center justify-center rounded-full bg-blue-100 text-blue-800 font-medium mr-3 mt-0.5">2</div>
+            <p className="text-gray-700">
+              La progesterona se llama así porque es progestacional (favorece la gestación).
+            </p>
+          </div>
+          
+          <div className="flex items-start bg-white p-4 rounded-lg shadow-sm">
+            <div className="flex-shrink-0 h-8 w-8 flex items-center justify-center rounded-full bg-blue-100 text-blue-800 font-medium mr-3 mt-0.5">3</div>
+            <p className="text-gray-700">
+              Otra acción de la progesterona es convertir el endometrio proliferativo (por acción de los estrógenos) en un endometrio receptivo al embrión.
+            </p>
+          </div>
+
+          <div className="flex items-start bg-white p-4 rounded-lg shadow-sm">
+            <div className="flex-shrink-0 h-8 w-8 flex items-center justify-center rounded-full bg-blue-100 text-blue-800 font-medium mr-3 mt-0.5">4</div>
+            <p className="text-gray-700">
+              Cuando se administran antes de la ovulación, suprimen la ovulación (esto lo hacen todas las progestinas, el levonorgestrel no es excepción).
+            </p>
+          </div>
+        </div>
+      </section>
+      <div className='w-[60%] mx-auto'>
+      <VideoCard  title="" src="https://www.youtube.com/embed/Ihkk-qhacQc" />
+    </div>
+                        </div>
+                      </>
+                    )}
+                      {activeTab === "PAE" && (
+                      <>
+                        <h2 className="text-4xl font-bold text-indigo-700 mb-6">PÍLDORA ANTICONCEPTIVA DE EMERGENCIA (PAE), A VECES LLAMADA PÍLDORA "DEL DÍA DESPUÉS", "DE LA MAÑANA SIGUIENTE" O ANTICONCEPTIVOS POSTCOITALES.</h2>
+                        <Image src="/images/pae.jpg" alt="Métodos de Barrera" width={500} height={500} className="rounded-xl mb-6 mx-auto" />
+                        <div className="text-lg leading-relaxed text-gray-800 space-y-4">
+        <div className="max-w-3xl mx-auto p-6">
+      <h1 className="text-3xl font-bold text-center mb-6">MODO DE USO</h1>
+
+      <div className="space-y-4 mb-8">
+        <div className="bg-white p-4 rounded-lg shadow-sm">
+          <p className="text-gray-700">
+            <strong>1.</strong> Excluya la posibilidad de que la usuaria esté embarazada, determinando la fecha de su última menstruación.
+          </p>
+        </div>
+
+        <div className="bg-white p-4 rounded-lg shadow-sm">
+          <p className="text-gray-700">
+            <strong>2.</strong> Determine la fecha y hora del contacto sexual sin protección, para asegurar que la usuaria está a tiempo de recibir el tratamiento dentro del margen de tiempo requerido de 72 horas.
+          </p>
+        </div>
+
+        <div className="bg-white p-4 rounded-lg shadow-sm">
+          <p className="text-gray-700">
+            <strong>3.</strong> Pregunte si la usuaria está actualmente utilizando un método anticonceptivo regular; esta pregunta puede ser un buen punto de partida para una discusión sobre el uso de anticonceptivos regulares y como utilizarlos correctamente.
+          </p>
+        </div>
+
+        <div className="bg-white p-4 rounded-lg shadow-sm">
+          <p className="text-gray-700">
+            <strong>4.</strong> No se necesita un examen pélvico u otro tipo de pruebas a menos que haya dudas sobre el estado de embarazo o se indique por otras razones.
+          </p>
+        </div>
+
+        <div className="bg-white p-4 rounded-lg shadow-sm">
+          <p className="text-gray-700">
+            <strong>5.</strong> Provea las píldoras para la anticoncepción oral de emergencia.
+          </p>
+        </div>
+
+        <div className="bg-white p-4 rounded-lg shadow-sm">
+          <p className="text-gray-700">
+            <strong>6.</strong> Provea las instrucciones específicas sobre la forma de toma, efectos colaterales y su manejo, además de programar la visita de seguimiento.
+          </p>
+        </div>
+      </div>
+
+      <div className="bg-white p-4 rounded-lg shadow-sm">
+        <h2 className="text-xl font-semibold mb-3">Menstruación post-PAE</h2>
+        <p className="text-gray-700">
+          Este cuadro muestra datos sobre la llegada de la menstruación siguiente luego de usar las PAE.
+        </p>
+      </div>
+    </div>
+      <div className='w-[60%] mx-auto'>
+      <VideoCard  title="" src="https://www.youtube.com/embed/mP1dgyFu8K" />
     </div>
                         </div>
                       </>

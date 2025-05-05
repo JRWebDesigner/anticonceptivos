@@ -133,22 +133,42 @@ export default function HomePage() {
 
   const renderModal = () => (
     <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0, y: -50 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -50 }}
-        transition={{ duration: 0.3 }}
-        className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 bg-white p-6 rounded-xl shadow-xl border border-indigo-300 max-w-md w-full"
-      >
-        <div className="flex justify-between items-start mb-4">
-          <h3 className="text-xl font-bold text-indigo-800">Cuestionario Inicial</h3>
-        </div>
-        <p className="mb-4">Por favor complete este breve cuestionario para ayudarnos a personalizar su experiencia.</p>
-        <Link href="/cuestionario">
-          <Button className="w-full">Ir al Cuestionario</Button>
-        </Link>
-      </motion.div>
-    </AnimatePresence>
+  <motion.div
+    initial={{ opacity: 0, y: -50 }}
+    animate={{ opacity: 1, y: 0 }}
+    exit={{ opacity: 0, y: -50 }}
+    transition={{ duration: 0.3 }}
+    className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 bg-white p-6 rounded-xl shadow-xl border border-indigo-300 max-w-md w-full h-[90dvh] overflow-y-auto"
+  >
+    <div className="flex justify-between items-start mb-4">
+      <h3 className="text-xl font-bold text-indigo-800">Consentimiento Informado</h3>
+    </div>
+    <div className="space-y-4 text-sm text-gray-800">
+      <p><strong>Título:</strong> “Asesoramiento virtual como medio de prevención de embarazo en la comunidad estudiantil de la Universidad Privada Franz Tamayo 2025”</p>
+      <p><strong>Contenido:</strong> El cuestionario cuenta con 20 preguntas entre selección múltiple y de respuesta abierta cuya finalidad del presente trabajo de investigación es identificar las causas del embarazo en la comunidad estudiantil universitario.</p>
+      <p><strong>AUTORES:</strong></p>
+      <ul className="list-disc list-inside ml-4">
+        <li>Boyan Mendieta Rossely Keiko</li>
+        <li>Chejo Merlo Wilmer Reynaldo</li>
+        <li>Julliri Pinto Maribel</li>
+        <li>Murillo Amaru Ruth Karina</li>
+        <li>Paye Vilca Wilson Tito</li>
+        <li>Ríos Ordoñez Fernando Javier</li>
+        <li>Surco Cuaquira Melanni Belen</li>
+        <li>Torrez Tupa Coraima</li>
+      </ul>
+      <p><strong>Descripción del estudio:</strong> El propósito este estudio es determinar las causas que predisponen el embarazo en la comunidad estudiantil universitaria. El cuestionario está diseñado para recopilar información sobre los factores que predisponen el embarazo en la comunidad estudiantil y su participación contribuirá a mejorar el conocimiento en esta aérea</p>
+      <p><strong>Procedimiento:</strong> Se le solicitará que complete un cuestionario de – preguntas. Las cuales están relacionadas con información sobre los datos demográficos y como usted evita el embarazo perteneciendo a la comunidad universitaria.</p>
+      <p><strong>Participación voluntaria:</strong> Su participación es completamente voluntaria. Usted es libre de decidir si desea o no participar en esta investigación. Si en cualquier momento durante la investigación decide retirarse, puede hacerlo sin dar ninguna explicación ni sufrir ninguna penalización. Además, puede dejar de participar incluso después de realizar la encuesta.</p>
+      <p><strong>Confidencialidad:</strong> Toda la información que proporcione será tratada de manera confidencial. Sus respuestas serán anónimas y será utilizadas de manera que pueden identificarlo/a. Los datos recopilados se utilizarán únicamente para fines de investigación y serán procesados de forma estadística.</p>
+      <p><strong>Riesgos y beneficios:</strong> Usted no corre riesgo de esta investigación ya que solo se obtendrá la información proporcionada por su persona. Aunque no recibirá beneficios directos por su participación, su colaboración contribuirá al avance en el conocimiento acerca del embarazo en la comunidad universitaria.</p>
+      <p><strong>Contacto para preguntas:</strong> Si tiene alguna pregunta sobre este estudio o sobre sus derechos como participantes, puede contactarse con los autores.</p>
+    </div>
+    <Link href="/cuestionario">
+      <Button className="w-full mt-6">Ir al Cuestionario</Button>
+    </Link>
+  </motion.div>
+</AnimatePresence>
   );
 
   const renderMethodsSection = () => (

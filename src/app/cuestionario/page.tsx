@@ -326,7 +326,7 @@ export default function Questionnaire() {
           <form onSubmit={startQuiz} className="space-y-6">
             <div>
               <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
-                Nombre (o seudónimo)
+                Codigo de estudiante
               </label>
               <input
                 type="text"

@@ -138,7 +138,7 @@ export default function HomePage() {
     animate={{ opacity: 1, y: 0 }}
     exit={{ opacity: 0, y: -50 }}
     transition={{ duration: 0.3 }}
-    className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 bg-white p-6 rounded-xl shadow-xl border border-indigo-300 max-w-md w-full h-[90dvh] overflow-y-auto"
+    className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 bg-white p-6 rounded-xl shadow-xl border border-indigo-300 max-w-md w-[90%] h-[90dvh] overflow-y-auto"
   >
     <div className="flex justify-between items-start mb-4">
       <h3 className="text-xl font-bold text-indigo-800">Consentimiento Informado</h3>

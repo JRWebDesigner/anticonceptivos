@@ -94,7 +94,7 @@ export default function BarreraPage(){
         </nav> 
        </motion.div>
        <h1 className="text-4xl font-bold text-indigo-700 mb-6 text-center">Métodos de Barrera</h1>
-        <section className="w-[80%] max-w-[1300px] mx-auto scroll-mt-32">
+        <section className="w-[90%] max-w-[1300px] mx-auto scroll-mt-32">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -124,7 +124,7 @@ export default function BarreraPage(){
                   >
                     {activeTab === "condon-masculino" && (
                       <>
-                        <h2 className="text-4xl font-bold text-indigo-700 mb-6">CONDÓN MASCULINO</h2>
+                        <h2 className="text-2xl md:text-4xl font-bold text-indigo-700 mb-6">CONDÓN MASCULINO</h2>
                         <Image src="/images/condon-m.jpg" alt="Métodos Naturales" width={500} height={500} className="rounded-xl mb-6 mx-auto" />
                         <div className="text-lg leading-relaxed text-gray-800 space-y-4">
                             <section className="mb-8">
@@ -214,7 +214,7 @@ export default function BarreraPage(){
                     
                     {activeTab === "condon-femenino" && (
                       <>
-                        <h2 className="text-4xl font-bold text-indigo-700 mb-6">CONDÓN FEMENINO</h2>
+                        <h2 className="text-2xl md:text-4xl font-bold text-indigo-700 mb-6">CONDÓN FEMENINO</h2>
                         <Image src="/images/condon-femenino.jpg" alt="Métodos de Barrera" width={500} height={500} className="rounded-xl mb-6 mx-auto" />
                         <div className="text-lg leading-relaxed text-gray-800 space-y-4">
         <section className="mb-8">

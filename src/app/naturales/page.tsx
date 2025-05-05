@@ -96,7 +96,7 @@ export default function NatPage(){
         </nav> 
        </motion.div>
        <h1 className="text-4xl font-bold text-indigo-700 mb-6 text-center">Métodos Naturales</h1>
-        <section className="w-[80%] max-w-[1300px] mx-auto scroll-mt-32">
+        <section className="w-[90%] max-w-[1300px] mx-auto scroll-mt-32">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -126,7 +126,7 @@ export default function NatPage(){
                   >
                     {activeTab === "calendario" && (
                       <>
-                        <h2 className="text-4xl font-bold text-indigo-700 mb-6">MÉTODO DEL CALENDARIO O MÉTODO DEL RITMO</h2>
+                        <h2 className="text-2xl md:text-4xl font-bold text-indigo-700 mb-6">MÉTODO DEL CALENDARIO O MÉTODO DEL RITMO</h2>
                         <Image src="/images/calendario.jpg" alt="Métodos Naturales" width={500} height={500} className="rounded-xl mb-6 mx-auto" />
                         <div className="text-lg leading-relaxed text-gray-800 space-y-4">
                           <div className="p-4 max-w-3xl mx-auto">     
@@ -161,7 +161,7 @@ export default function NatPage(){
                     
                     {activeTab === "temperatura" && (
                       <>
-                        <h2 className="text-4xl font-bold text-indigo-700 mb-6">MÉTODO DE LA TEMPERATURA BASAL </h2>
+                        <h2 className="text-2xl md:text-4xl font-bold text-indigo-700 mb-6">MÉTODO DE LA TEMPERATURA BASAL </h2>
                         <Image src="/images/temperatura.jpg" alt="Métodos de Barrera" width={500} height={500} className="rounded-xl mb-6 mx-auto" />
                         <div className="text-lg leading-relaxed text-gray-800 space-y-4">
                           
@@ -197,7 +197,7 @@ export default function NatPage(){
                     
                     {activeTab === "cervical" && (
                       <>
-                        <h2 className="text-4xl font-bold text-indigo-700 mb-6">MÉTODO DEL MOCO CERVICAL</h2>
+                        <h2 className="text-2xl md:text-4xl font-bold text-indigo-700 mb-6">MÉTODO DEL MOCO CERVICAL</h2>
                         <Image src="/images/cervical.jpg" alt="Métodos Hormonales" width={500} height={500} className="rounded-xl mb-6 mx-auto" />
                         <div className="text-lg leading-relaxed text-gray-800 space-y-4">
                           <section className="mb-8">
@@ -253,7 +253,7 @@ export default function NatPage(){
                     
                     {activeTab === "retiro" && (
                       <>
-                        <h2 className="text-4xl font-bold text-indigo-700 mb-6">MÉTODO DEL RETIRO</h2>
+                        <h2 className="text-2xl md:text-4xl font-bold text-indigo-700 mb-6">MÉTODO DEL RETIRO</h2>
                         <Image src="/images/retiro.jpg" alt="DIU" width={500} height={500} className="rounded-xl mb-6 mx-auto" />
                         <div className="text-lg leading-relaxed text-gray-800 space-y-4">
                          <section className="mb-8">

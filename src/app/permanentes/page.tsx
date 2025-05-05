@@ -93,7 +93,7 @@ export default function PerPage(){
         </nav> 
        </motion.div>
        <h1 className="text-4xl font-bold text-indigo-700 mb-6 text-center">Métodos Permanentes</h1>
-        <section className="w-[80%] max-w-[1300px] mx-auto scroll-mt-32">
+        <section className="w-[90%] max-w-[1300px] mx-auto scroll-mt-32">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -123,7 +123,7 @@ export default function PerPage(){
                   >
                     {activeTab === "vasectomia" && (
                       <>
-                        <h2 className="text-4xl font-bold text-indigo-700 mb-6">VASECTOMÍA</h2>
+                        <h2 className="text-2xl md:text-4xl font-bold text-indigo-700 mb-6">VASECTOMÍA</h2>
                         <Image src="/images/vasectomia.jpg" alt="Métodos Naturales" width={500} height={500} className="rounded-xl mb-6 mx-auto" />
                         <div className="text-lg leading-relaxed text-gray-800 space-y-4">
                              

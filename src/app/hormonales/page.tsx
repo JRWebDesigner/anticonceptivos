@@ -128,7 +128,7 @@ export default function BarreraPage(){
                   >
                     {activeTab === "progestina" && (
                       <>
-                        <h2 className="text-4xl font-bold text-indigo-700 mb-6">PÍLDORAS DE PROGESTINA SOLA</h2>
+                        <h2 className="text-2xl md:text-4xl font-bold text-indigo-700 mb-6">PÍLDORAS DE PROGESTINA SOLA</h2>
                         <Image src="/images/hormonales.jpg" alt="Métodos Naturales" width={500} height={500} className="rounded-xl mb-6 mx-auto" />
                         <div className="text-lg leading-relaxed text-gray-800 space-y-4">
                              <section className="mb-8 bg-blue-50 p-5 rounded-lg">
@@ -234,7 +234,7 @@ export default function BarreraPage(){
                     
                     {activeTab === "inyectables" && (
                       <>
-                        <h2 className="text-4xl font-bold text-indigo-700 mb-6">ANTICONCEPTIVOS INYECTABLES COMBINADOS</h2>
+                        <h2 className="text-2xl md:text-4xl font-bold text-indigo-700 mb-6">ANTICONCEPTIVOS INYECTABLES COMBINADOS</h2>
                         <Image src="/images/inyectables.jpg" alt="Métodos de Barrera" width={500} height={500} className="rounded-xl mb-6 mx-auto" />
                         <div className="text-lg leading-relaxed text-gray-800 space-y-4">
         <section className="mb-8 bg-blue-50 p-5 rounded-lg">
@@ -349,7 +349,7 @@ export default function BarreraPage(){
                     )}
                     {activeTab === "anillo" && (
                       <>
-                        <h2 className="text-4xl font-bold text-indigo-700 mb-6">ANILLO VAGINAL</h2>
+                        <h2 className="text-2xl md:text-4xl font-bold text-indigo-700 mb-6">ANILLO VAGINAL</h2>
                         <Image src="/images/inyectables.jpg" alt="Métodos de Barrera" width={500} height={500} className="rounded-xl mb-6 mx-auto" />
                         <div className="text-lg leading-relaxed text-gray-800 space-y-4">
         <section className="mb-8">
@@ -405,7 +405,7 @@ export default function BarreraPage(){
                     )}
                     {activeTab === "AOC" && (
                       <>
-                        <h2 className="text-4xl font-bold text-indigo-700 mb-6">ANTICONCEPTIVOS ORALES COMBINADOS (AOC)</h2>
+                        <h2 className="text-2xl md:text-4xl font-bold text-indigo-700 mb-6">ANTICONCEPTIVOS ORALES COMBINADOS (AOC)</h2>
                         <Image src="/images/inyectables.jpg" alt="Métodos de Barrera" width={500} height={500} className="rounded-xl mb-6 mx-auto" />
                         <div className="text-lg leading-relaxed text-gray-800 space-y-4">
         <section className="mb-8">
@@ -462,7 +462,7 @@ export default function BarreraPage(){
                     )}
                       {activeTab === "AOE" && (
                       <>
-                        <h2 className="text-4xl font-bold text-indigo-700 mb-6">ANTICONCEPCIÓN ORAL DE EMERGENCIA (AOE)
+                        <h2 className="text-2xl md:text-2xl md:text-4xl font-bold text-indigo-700 mb-6">ANTICONCEPCIÓN ORAL DE EMERGENCIA (AOE)
 PÍLDORA ANTICONCEPTIVA DE EMERGENCIA
 </h2>
                         <Image src="/images/aoe.jpg" alt="Métodos de Barrera" width={500} height={500} className="rounded-xl mb-6 mx-auto" />
@@ -514,7 +514,7 @@ PÍLDORA ANTICONCEPTIVA DE EMERGENCIA
                     )}
                       {activeTab === "PAE" && (
                       <>
-                        <h2 className="text-4xl font-bold text-indigo-700 mb-6">PÍLDORA ANTICONCEPTIVA DE EMERGENCIA (PAE), A VECES LLAMADA PÍLDORA &quot;DEL DÍA DESPUÉS&quot;, &quot;DE LA MAÑANA SIGUIENTE&quot; O ANTICONCEPTIVOS POSTCOITALES.</h2>
+                        <h2 className="text-2xl md:text-4xl font-bold text-indigo-700 mb-6">PÍLDORA ANTICONCEPTIVA DE EMERGENCIA (PAE), A VECES LLAMADA PÍLDORA &quot;DEL DÍA DESPUÉS&quot;, &quot;DE LA MAÑANA SIGUIENTE&quot; O ANTICONCEPTIVOS POSTCOITALES.</h2>
                         <Image src="/images/pae.jpg" alt="Métodos de Barrera" width={500} height={500} className="rounded-xl mb-6 mx-auto" />
                         <div className="text-lg leading-relaxed text-gray-800 space-y-4">
         <div className="max-w-3xl mx-auto p-6">

@@ -94,7 +94,7 @@ export default function DiuPage(){
         </nav> 
        </motion.div>
        <h1 className="text-4xl font-bold text-indigo-700 mb-6 text-center">Dispositivos Intrauterinos (DIU)</h1>
-        <section className="w-[80%] max-w-[1300px] mx-auto scroll-mt-32">
+        <section className="w-[90%] max-w-[1300px] mx-auto scroll-mt-32">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -124,7 +124,7 @@ export default function DiuPage(){
                   >
                     {activeTab === "diu" && (
                       <>
-                        <h2 className="text-4xl font-bold text-indigo-700 mb-6">DISPOSITIVOS INTRAUTERINOS(DIU)</h2>
+                        <h2 className="text-2xl md:text-4xl font-bold text-indigo-700 mb-6">DISPOSITIVOS INTRAUTERINOS(DIU)</h2>
                         <Image src="/images/diu.jpg" alt="Métodos Naturales" width={500} height={500} className="rounded-xl mb-6 mx-auto" />
                         <div className="text-lg leading-relaxed text-gray-800 space-y-4">
                              <section className="mb-8 bg-blue-50 p-5 rounded-lg">
@@ -167,7 +167,7 @@ export default function DiuPage(){
                     
                     {activeTab === "diu-hormonal" && (
                       <>
-                        <h2 className="text-4xl font-bold text-indigo-700 mb-6">DIU HORMONAL</h2>
+                        <h2 className="text-2xl md:text-4xl font-bold text-indigo-700 mb-6">DIU HORMONAL</h2>
                         <Image src="/images/diu-hormonal.jpg" alt="Métodos de Barrera" width={500} height={500} className="rounded-xl mb-6 mx-auto" />
                         <div className="text-lg leading-relaxed text-gray-800 space-y-4">
               <section className="mb-8 bg-pink-50 p-5 rounded-lg">

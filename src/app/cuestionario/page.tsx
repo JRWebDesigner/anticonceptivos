@@ -353,12 +353,28 @@ export default function Questionnaire() {
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
               >
                 <option value="">Selecciona tu edad</option>
-                {[15, 16, 17, 18, 19].map(age => (
-                  <option key={age} value={age}>{age} años</option>
+                {[15, 16, 17, 18, 19,20,21].map(age => (
+                  <option key={age} value={age}>{age === 21 ? '+21 años' : `${age} años`}</option>
                 ))}
               </select>
             </div>
-            
+            <div>
+              <label htmlFor="gender" className="block text-sm font-medium text-gray-700 mb-1">
+                Sexo
+              </label>
+              <select
+                id="gender"
+                name="gender"
+                value={userData.gender}
+                onChange={handleUserDataChange}
+                required
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
+              >
+                <option value="">Selecciona tu sexo</option>
+                <option value="masculino">Masculino</option>
+                <option value="femenino">Femenino</option>
+              </select>
+            </div>
             <div className="pt-4">
               <button
                 type="submit"

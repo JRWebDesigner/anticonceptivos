@@ -881,36 +881,40 @@ w.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                   </div>
 
                   <div className="bg-white p-6 rounded-lg shadow-md">
-                    <h2 className="text-xl font-semibold mb-4 text-indigo-700">Lista de Usuarios</h2>
-                    <div className="max-h-80 overflow-y-auto">
-                      <table className="min-w-full divide-y divide-gray-200">
-                        <thead className="bg-gray-50">
-                          <tr>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Usuario</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Edad</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Puntaje</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Última respuesta</th>
-                          </tr>
-                        </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
-                          {userChartData.map((user, i) => (
-                            <tr 
-                              key={i} 
-                              className={`cursor-pointer hover:bg-indigo-50 ${selectedUser === user.userId ? "bg-indigo-100" : ""}`}
-                              onClick={() => setSelectedUser(user.userId)}
-                            >
-                              <td className="px-6 py-4 whitespace-nowrap">{user.name}</td>
-                              <td className="px-6 py-4 whitespace-nowrap">{user.age} años</td>
-                              <td className="px-6 py-4 whitespace-nowrap">{user.averageScore.toFixed(1)}%</td>
-                              <td className="px-6 py-4 whitespace-nowrap">{user.lastResponse}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                </div>
-
+              <h2 className="text-xl font-semibold mb-4 text-indigo-700">Lista de Usuarios</h2>
+              <div className="max-h-80 overflow-y-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Usuario</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Edad</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Género</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Puntaje</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Última respuesta</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {userChartData.map((user, i) => {
+                      const userResponse = responses.find(r => r.userId === user.userId);
+                      return (
+                        <tr 
+                          key={i} 
+                          className={`cursor-pointer hover:bg-indigo-50 ${selectedUser === user.userId ? "bg-indigo-100" : ""}`}
+                          onClick={() => setSelectedUser(user.userId)}
+                        >
+                          <td className="px-6 py-4 whitespace-nowrap">{user.name}</td>
+                          <td className="px-6 py-4 whitespace-nowrap">{formatAge(user.age)}</td>
+                          <td className="px-6 py-4 whitespace-nowrap">{userResponse?.userGender || 'No especificado'}</td>
+                          <td className="px-6 py-4 whitespace-nowrap">{user.averageScore.toFixed(1)}%</td>
+                          <td className="px-6 py-4 whitespace-nowrap">{user.lastResponse}</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
                 {selectedUser && (
                   <div className="bg-white p-6 rounded-lg shadow-md">
                     <h2 className="text-xl font-semibold mb-4 text-indigo-700">

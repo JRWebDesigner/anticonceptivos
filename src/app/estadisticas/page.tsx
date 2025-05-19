@@ -32,7 +32,7 @@ interface Question {
 }
 
 const questions: Question[] = [
-  {
+   {
     id: 1,
     text: "Los métodos anticonceptivos son:",
     options: [
@@ -326,6 +326,30 @@ export default function StatsDashboard() {
   const dateStats = responses.reduce((acc, response) => {
     const date = format(new Date(response.timestamp?.seconds * 1000), 'yyyy-MM-dd', { locale: es });
     if (!acc[date]) acc[date] = { correct: 0, total: 0, count: 0 };
+    
+    const correctAnswers = response.answers.reduce((sum, answer, i) => {
+      if (answer !== null) {
+        acc[date].total++;
+        if (answer === questions[i].correctAnswer) {
+          return sum + 1;
+        }
+      }
+      return sum;
+    }, 0);
+    
+    acc[date].correct += correctAnswers;
+    acc[date].count++;
+    return acc;
+  }, {} as Record<string, { correct: number; total: number; count: number }>);
+
+  const dateChartData = Object.entries(dateStats).map(([date, stats]) => ({
+    date,
+    correctRate: stats.total ? (stats.correct / stats.total) * 100 : 0,
+    averageScore: stats.count ? (stats.correct / (stats.count * questions.length)) * 100 : 0,
+    responses: stats.count
+  }));
+
+  // Estadísticas por género
   const genderStats = responses.reduce((acc, response) => {
     const gender = response.userGender || 'No especificado';
     
@@ -342,7 +366,7 @@ export default function StatsDashboard() {
       acc[gender].users.add(response.userId);
     }
 
-const correctAnswers = response.answers.reduce((sum, answer, i) => {
+    const correctAnswers = response.answers.reduce((sum, answer, i) => {
       if (answer !== null && questions[i]) {
         acc[gender].total++;
         if (answer === questions[i].correctAnswer) {
@@ -362,18 +386,13 @@ const correctAnswers = response.answers.reduce((sum, answer, i) => {
     count: number;
     users: Set<string>;
   }>);
-const genderChartData = Object.entries(genderStats).map(([gender, stats]) => ({
+
+  const genderChartData = Object.entries(genderStats).map(([gender, stats]) => ({
     gender,
     correctRate: stats.total ? (stats.correct / stats.total) * 100 : 0,
     averageScore: stats.count ? (stats.correct / (stats.count * questions.length)) * 100 : 0,
     responses: stats.count,
     users: stats.users.size
-  }));
-  const dateChartData = Object.entries(dateStats).map(([date, stats]) => ({
-    date,
-    correctRate: stats.total ? (stats.correct / stats.total) * 100 : 0,
-    averageScore: stats.count ? (stats.correct / (stats.count * questions.length)) * 100 : 0,
-    responses: stats.count
   }));
 
   // Estadísticas por usuario
@@ -385,17 +404,46 @@ const genderChartData = Object.entries(genderStats).map(([gender, stats]) => ({
       acc[userId] = {
         name: userName,
         age: response.userAge,
+        gender: response.userGender || 'No especificado',
         correct: 0,
         total: 0,
         count: 0,
         lastResponse: response.timestamp as Timestamp
       };
     }
+    
+    const correctAnswers = response.answers.reduce((sum, answer, i) => {
+      if (answer !== null && questions[i]) {
+        acc[userId].total++;
+        if (answer === questions[i].correctAnswer) {
+          return sum + 1;
+        }
+      }
+      return sum;
+    }, 0);
+    
+    acc[userId].correct += correctAnswers;
+    acc[userId].count++;
+    if (response.timestamp > acc[userId].lastResponse) {
+      acc[userId].lastResponse = response.timestamp;
+    }
+    
+    return acc;
+  }, {} as Record<string, { 
+    name: string; 
+    age: number;
+    gender: string;
+    correct: number; 
+    total: number; 
+    count: number; 
+    lastResponse: Timestamp 
+  }>);
 
   const userChartData = Object.entries(userStats).map(([userId, stats]) => ({
     userId,
     name: stats.name,
     age: stats.age,
+    gender: stats.gender,
     correctRate: stats.total ? (stats.correct / stats.total) * 100 : 0,
     averageScore: stats.count ? (stats.correct / (stats.count * questions.length)) * 100 : 0,
     responses: stats.count,
@@ -428,7 +476,6 @@ const genderChartData = Object.entries(genderStats).map(([gender, stats]) => ({
   }));
 
   // Estadísticas por edad
-    
   const ageStats = responses.reduce((acc, response) => {
     const age = response.userAge >= 21 ? 21 : response.userAge;
     const gender = response.userGender || 'No especificado';
@@ -473,6 +520,7 @@ const genderChartData = Object.entries(genderStats).map(([gender, stats]) => ({
     users: Set<string>;
     genders: Record<string, number>;
   }>);
+
   const ageChartData = Object.entries(ageStats).map(([age, stats]) => ({
     age: formatAge(age),
     rawAge: parseInt(age),
@@ -483,97 +531,116 @@ const genderChartData = Object.entries(genderStats).map(([gender, stats]) => ({
     genders: stats.genders
   }));
 
-  // Hoja 3: Resumen por pregunta
-  const questionsSheet = questions.map((q, i) => {
-    const total = generalStats[i]?.total || 0;
-    const correct = generalStats[i]?.correct || 0;
-    const percentage = total ? ((correct / total) * 100).toFixed(1) : '0';
+  // Exportar a Excel
+  const exportToExcel = () => {
+    // Hoja 1: Respuestas detalladas
+    const responsesSheet = responses.map((response, idx) => {
+      const answersFormatted = response.answers.map((answer, i) => {
+        if (answer === null) return 'Sin responder';
+        const isCorrect = answer === questions[i].correctAnswer;
+        return `${answer + 1} (${isCorrect ? '✔' : '✘'})`;
+      });
 
-    return {
-      "ID Pregunta": `P${i + 1}`,
-      "Categoría": q.category || "General",
-      "Texto Pregunta": q.text,
-      "Respuesta Correcta": q.options[q.correctAnswer],
-      "Total Respuestas": total,
-      "Aciertos": correct,
-      "Porcentaje Acierto": `${percentage}%`,
-      "Dificultad": getDifficultyLevel(correct, total)
-    };
-  });
+      const correctAnswers = response.answers.reduce((sum, answer, i) => {
+        return answer === questions[i].correctAnswer ? sum + 1 : sum;
+      }, 0);
+      
+      const percentage = (correctAnswers / questions.length * 100).toFixed(1);
 
-  // Hoja 4: Resumen por usuario
-  const usersSheet = userChartData.map(user => ({
-    "ID Usuario": user.userId,
-    "Nombre": user.name,
-    "Edad": user.age,
-    "Total Respuestas": user.responses,
-    "Puntaje Promedio": `${user.averageScore.toFixed(1)}%`,
-    "Última Participación": user.lastResponse,
-    "Nivel de Desempeño": getPerformanceLevel(user.averageScore)
-  }));
+      return {
+        "ID": idx + 1,
+        "Usuario": response.userName,
+        "Edad": formatAge(response.userAge),
+        "Género": response.userGender || 'No especificado',
+        "Fecha": format(new Date(response.timestamp?.seconds * 1000), 'dd/MM/yyyy HH:mm', { locale: es }),
+        "Puntaje Total": `${correctAnswers}/${questions.length}`,
+        "Porcentaje": `${percentage}%`,
+        ...questions.reduce((acc, q, i) => {
+          acc[`P${i + 1}`] = answersFormatted[i];
+          return acc;
+        }, {} as Record<string, string>)
+      };
+    });
 
-  // Función auxiliar para determinar nivel de desempeño
-  function getPerformanceLevel(score: number): string {
-    if (score >= 85) return "Excelente";
-    if (score >= 70) return "Bueno";
-    if (score >= 50) return "Regular";
-    return "Necesita mejorar";
-  }
+    // Hoja 2: Resumen por edad
+    const ageSummarySheet = ageChartData.map(age => ({
+      "Grupo de Edad": age.age,
+      "Usuarios Únicos": age.users,
+      "Total Respuestas": age.responses,
+      "Preguntas Correctas": `${age.correctRate.toFixed(1)}%`,
+      "Puntaje Promedio": `${age.averageScore.toFixed(1)}%`,
+      "Desempeño": getPerformanceLevel(age.averageScore)
+    }));
 
-  // Función auxiliar para determinar dificultad
-  function getDifficultyLevel(correct: number, total: number): string {
-    if (total === 0) return "Sin datos";
-    const percentage = (correct / total) * 100;
-    if (percentage >= 70) return "Fácil";
-    if (percentage >= 40) return "Moderada";
-    return "Difícil";
-  }
+    // Hoja 3: Resumen por pregunta
+    const questionsSheet = questions.map((q, i) => {
+      const total = generalStats[i]?.total || 0;
+      const correct = generalStats[i]?.correct || 0;
+      const percentage = total ? ((correct / total) * 100).toFixed(1) : '0';
 
-  // Crear libro Excel
-  const wb = XLSX.utils.book_new();
-  
-  // Hoja de respuestas con formato mejorado
-  const wsResponses = XLSX.utils.json_to_sheet(responsesSheet);
-  wsResponses["!cols"] = [
-    { width: 5 },  // ID
-    { width: 20 }, // Usuario
-    { width: 8 },  // Edad
-    { width: 16 }, // Fecha
-    { width: 12 }, // Puntaje
-    { width: 12 }, // Porcentaje
-    ...questions.map(() => ({ width: 10 })) // Columnas de preguntas
-  ];
-  XLSX.utils.book_append_sheet(wb, wsResponses, "Respuestas");
-  
-  // Hoja de resumen por edad
-  const wsAge = XLSX.utils.json_to_sheet(ageSummarySheet);
-  wsAge["!cols"] = [
-    { width: 12 }, { width: 12 }, { width: 12 }, 
-    { width: 14 }, { width: 14 }, { width: 14 }
-  ];
-  XLSX.utils.book_append_sheet(wb, wsAge, "Por Edad");
-  
-  // Hoja de preguntas
-  const wsQuestions = XLSX.utils.json_to_sheet(questionsSheet);
-  wsQuestions["!cols"] = [
-    { width: 10 }, { width: 15 }, { width: 40 }, 
-    { width: 25 }, { width: 12 }, { width: 10 },
-    { width: 14 }, { width: 12 }
-  ];
-  XLSX.utils.book_append_sheet(wb, wsQuestions, "Preguntas");
-  
-  // Hoja de usuarios
-  const wsUsers = XLSX.utils.json_to_sheet(usersSheet);
-  wsUsers["!cols"] = [
-    { width: 15 }, { width: 20 }, { width: 8 }, 
-    { width: 12 }, { width: 14 }, { width: 18 },
-    { width: 16 }
-  ];
-  XLSX.utils.book_append_sheet(wb, wsUsers, "Usuarios");
+      return {
+        "ID Pregunta": `P${i + 1}`,
+        "Categoría": q.category || "General",
+        "Texto Pregunta": q.text,
+        "Respuesta Correcta": q.options[q.correctAnswer],
+        "Total Respuestas": total,
+        "Aciertos": correct,
+        "Porcentaje Acierto": `${percentage}%`,
+        "Dificultad": getDifficultyLevel(correct, total)
+      };
+    });
 
-  // Generar el archivo Excel
-  XLSX.writeFile(wb, `Estadisticas_${format(new Date(), 'yyyy-MM-dd')}.xlsx`);
-};
+    // Hoja 4: Resumen por usuario
+    const usersSheet = userChartData.map(user => ({
+      "ID Usuario": user.userId,
+      "Nombre": user.name,
+      "Edad": formatAge(user.age),
+      "Género": user.gender,
+      "Total Respuestas": user.responses,
+      "Puntaje Promedio": `${user.averageScore.toFixed(1)}%`,
+      "Última Participación": user.lastResponse,
+      "Nivel de Desempeño": getPerformanceLevel(user.averageScore)
+    }));
+
+    // Hoja 5: Resumen por género
+    const genderSummarySheet = genderChartData.map(gender => ({
+      "Género": gender.gender,
+      "Usuarios Únicos": gender.users,
+      "Total Respuestas": gender.responses,
+      "Preguntas Correctas": `${gender.correctRate.toFixed(1)}%`,
+      "Puntaje Promedio": `${gender.averageScore.toFixed(1)}%`
+    }));
+
+    // Función auxiliar para determinar nivel de desempeño
+    function getPerformanceLevel(score: number): string {
+      if (score >= 85) return "Excelente";
+      if (score >= 70) return "Bueno";
+      if (score >= 50) return "Regular";
+      return "Necesita mejorar";
+    }
+
+    // Función auxiliar para determinar dificultad
+    function getDifficultyLevel(correct: number, total: number): string {
+      if (total === 0) return "Sin datos";
+      const percentage = (correct / total) * 100;
+      if (percentage >= 70) return "Fácil";
+      if (percentage >= 40) return "Moderada";
+      return "Difícil";
+    }
+
+    // Crear libro Excel
+    const wb = XLSX.utils.book_new();
+    
+    // Añadir hojas
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(responsesSheet), "Respuestas");
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(ageSummarySheet), "Por Edad");
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(genderSummarySheet), "Por Género");
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(questionsSheet), "Preguntas");
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(usersSheet), "Usuarios");
+
+    // Generar el archivo Excel
+    XLSX.writeFile(wb, `Estadisticas_${format(new Date(), 'yyyy-MM-dd')}.xlsx`);
+  };
 
   // Reiniciar estadísticas
   const resetStatistics = async () => {
@@ -718,7 +785,6 @@ const genderChartData = Object.entries(genderStats).map(([gender, stats]) => ({
     </div>
   );
 
-
   return (
     <>
       <header className='block md:sticky top-0 z-50 bg-white/80 backdrop-blur-md py-4 mb-12 border-b border-indigo-200 shadow-sm'>
@@ -726,7 +792,39 @@ const genderChartData = Object.entries(genderStats).map(([gender, stats]) => ({
           <Link className='px-4 py-2 rounded-lg transition font-semibold bg-indigo-100 hover:bg-indigo-200 text-indigo-800' href='/'>Inicio</Link>
           <Link className='px-4 py-2 rounded-lg transition font-semibold bg-indigo-100 hover:bg-indigo-200 text-indigo-800' href='/cuestionario'>Cuestionario</Link>
           <Link className='px-4 py-2 rounded-lg transition font-semibold bg-indigo-100 hover:bg-indigo-200 text-indigo-800' href='/estadisticas'>Estadísticas</Link>
-w.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+        </nav>
+      </header>
+      
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-3xl font-bold text-indigo-800">Dashboard de Estadísticas</h1>
+          <div className="flex gap-2">
+            <button 
+              onClick={exportToExcel}
+              disabled={responses.length === 0}
+              className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition flex items-center gap-2 disabled:bg-gray-400 disabled:cursor-not-allowed"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
+              </svg>
+              Exportar a Excel
+            </button>
+            <button 
+              onClick={resetStatistics}
+              disabled={isResetting || responses.length === 0}
+              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition flex items-center gap-2 disabled:bg-red-300 disabled:cursor-not-allowed"
+            >
+              {isResetting ? (
+                <>
+                  <svg className="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Borrando...
+                </>
+              ) : (
+                <>
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                     <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
                   </svg>
                   Reiniciar Estadísticas
@@ -881,40 +979,38 @@ w.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                   </div>
 
                   <div className="bg-white p-6 rounded-lg shadow-md">
-              <h2 className="text-xl font-semibold mb-4 text-indigo-700">Lista de Usuarios</h2>
-              <div className="max-h-80 overflow-y-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Usuario</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Edad</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Género</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Puntaje</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Última respuesta</th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {userChartData.map((user, i) => {
-                      const userResponse = responses.find(r => r.userId === user.userId);
-                      return (
-                        <tr 
-                          key={i} 
-                          className={`cursor-pointer hover:bg-indigo-50 ${selectedUser === user.userId ? "bg-indigo-100" : ""}`}
-                          onClick={() => setSelectedUser(user.userId)}
-                        >
-                          <td className="px-6 py-4 whitespace-nowrap">{user.name}</td>
-                          <td className="px-6 py-4 whitespace-nowrap">{formatAge(user.age)}</td>
-                          <td className="px-6 py-4 whitespace-nowrap">{userResponse?.userGender || 'No especificado'}</td>
-                          <td className="px-6 py-4 whitespace-nowrap">{user.averageScore.toFixed(1)}%</td>
-                          <td className="px-6 py-4 whitespace-nowrap">{user.lastResponse}</td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
+                    <h2 className="text-xl font-semibold mb-4 text-indigo-700">Lista de Usuarios</h2>
+                    <div className="max-h-80 overflow-y-auto">
+                      <table className="min-w-full divide-y divide-gray-200">
+                        <thead className="bg-gray-50">
+                          <tr>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Usuario</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Edad</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Género</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Puntaje</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Última respuesta</th>
+                          </tr>
+                        </thead>
+                        <tbody className="bg-white divide-y divide-gray-200">
+                          {userChartData.map((user, i) => (
+                            <tr 
+                              key={i} 
+                              className={`cursor-pointer hover:bg-indigo-50 ${selectedUser === user.userId ? "bg-indigo-100" : ""}`}
+                              onClick={() => setSelectedUser(user.userId)}
+                            >
+                              <td className="px-6 py-4 whitespace-nowrap">{user.name}</td>
+                              <td className="px-6 py-4 whitespace-nowrap">{formatAge(user.age)}</td>
+                              <td className="px-6 py-4 whitespace-nowrap">{user.gender}</td>
+                              <td className="px-6 py-4 whitespace-nowrap">{user.averageScore.toFixed(1)}%</td>
+                              <td className="px-6 py-4 whitespace-nowrap">{user.lastResponse}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+                
                 {selectedUser && (
                   <div className="bg-white p-6 rounded-lg shadow-md">
                     <h2 className="text-xl font-semibold mb-4 text-indigo-700">
@@ -930,39 +1026,41 @@ w.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                           </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
-                          {userResponses.map((response, i) => {
-                            const correctCount = response.answers.reduce((sum, answer, i) => {
-                              return answer === questions[i].correctAnswer ? sum + 1 : sum;
-                            }, 0);
-                            const score = (correctCount / questions.length) * 100;
-                            const date = format(new Date(response.timestamp?.seconds * 1000), 'PPpp', { locale: es });
+                          {responses
+                            .filter(r => r.userId === selectedUser)
+                            .map((response, i) => {
+                              const correctCount = response.answers.reduce((sum, answer, i) => {
+                                return answer === questions[i].correctAnswer ? sum + 1 : sum;
+                              }, 0);
+                              const score = (correctCount / questions.length) * 100;
+                              const date = format(new Date(response.timestamp?.seconds * 1000), 'PPpp', { locale: es });
 
-                            return (
-                              <tr key={i}>
-                                <td className="px-6 py-4 whitespace-nowrap">{date}</td>
-                                <td className="px-6 py-4 whitespace-nowrap">{score.toFixed(1)}%</td>
-                                <td className="px-6 py-4 whitespace-normal">
-                                  <div className="flex flex-wrap gap-1">
-                                    {response.answers.map((answer, j) => (
-                                      <span 
-                                        key={j}
-                                        className={`inline-block w-6 h-6 rounded-full text-xs flex items-center justify-center ${
-                                          answer === questions[j].correctAnswer 
-                                            ? "bg-green-100 text-green-800" 
-                                            : answer === null 
-                                              ? "bg-gray-100 text-gray-800" 
-                                              : "bg-red-100 text-red-800"
-                                        }`}
-                                        title={`P${j + 1}: ${questions[j].text}`}
-                                      >
-                                        {j + 1}
-                                      </span>
-                                    ))}
-                                  </div>
-                                </td>
-                              </tr>
-                            );
-                          })}
+                              return (
+                                <tr key={i}>
+                                  <td className="px-6 py-4 whitespace-nowrap">{date}</td>
+                                  <td className="px-6 py-4 whitespace-nowrap">{score.toFixed(1)}%</td>
+                                  <td className="px-6 py-4 whitespace-normal">
+                                    <div className="flex flex-wrap gap-1">
+                                      {response.answers.map((answer, j) => (
+                                        <span 
+                                          key={j}
+                                          className={`inline-block w-6 h-6 rounded-full text-xs flex items-center justify-center ${
+                                            answer === questions[j].correctAnswer 
+                                              ? "bg-green-100 text-green-800" 
+                                              : answer === null 
+                                                ? "bg-gray-100 text-gray-800" 
+                                                : "bg-red-100 text-red-800"
+                                          }`}
+                                          title={`P${j + 1}: ${questions[j].text}`}
+                                        >
+                                          {j + 1}
+                                        </span>
+                                      ))}
+                                    </div>
+                                  </td>
+                                </tr>
+                              );
+                            })}
                         </tbody>
                       </table>
                     </div>

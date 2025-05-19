@@ -256,7 +256,8 @@ export default function Questionnaire() {
   const [isComplete, setIsComplete] = useState(false);
   const [userData, setUserData] = useState({
     name: '',
-    age: ''
+    age: '',
+    gender:''
   });
   const [showQuestions, setShowQuestions] = useState(false);
 

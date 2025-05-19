@@ -293,7 +293,7 @@ export default function Questionnaire() {
     setAnswers(Array(questions.length).fill(null));
     setIsComplete(false);
     setShowQuestions(false);
-    setUserData({ name: '', age: '' });
+    setUserData({ name: '', age: '', gender:'' });
   };
   
   const handleUserDataChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {

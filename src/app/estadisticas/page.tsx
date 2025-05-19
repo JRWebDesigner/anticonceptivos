@@ -474,15 +474,14 @@ const genderChartData = Object.entries(genderStats).map(([gender, stats]) => ({
     genders: Record<string, number>;
   }>);
   const ageChartData = Object.entries(ageStats).map(([age, stats]) => ({
-    age: `${age} años`,
+    age: formatAge(age),
+    rawAge: parseInt(age),
     correctRate: stats.total ? (stats.correct / stats.total) * 100 : 0,
     averageScore: stats.count ? (stats.correct / (stats.count * questions.length)) * 100 : 0,
     responses: stats.count,
-    users: stats.users.size
+    users: stats.users.size,
+    genders: stats.genders
   }));
-
-  // Datos de usuario seleccionado
-);
 
   // Hoja 3: Resumen por pregunta
   const questionsSheet = questions.map((q, i) => {
@@ -608,7 +607,8 @@ const genderChartData = Object.entries(genderStats).map(([gender, stats]) => ({
     <div className="bg-white p-6 rounded-lg shadow-md mb-8">
       <h2 className="text-xl font-semibold mb-4 text-indigo-700">Información Demográfica</h2>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* Gráfico de distribución por edad */}
         <div>
           <h3 className="font-medium text-gray-700 mb-3">Distribución por Edad</h3>
           <div className="h-64">
@@ -632,15 +632,46 @@ const genderChartData = Object.entries(genderStats).map(([gender, stats]) => ({
           </div>
         </div>
         
+        {/* Gráfico de distribución por género */}
         <div>
-          <h3 className="font-medium text-gray-700 mb-3">Rendimiento por Edad</h3>
+          <h3 className="font-medium text-gray-700 mb-3">Distribución por Género</h3>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={ageChartData}>
+              <PieChart>
+                <Pie
+                  data={genderChartData}
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={80}
+                  fill="#8884d8"
+                  dataKey="users"
+                  nameKey="gender"
+                  label={(entry) => `${entry.gender}: ${entry.users}`}
+                >
+                  {genderChartData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip formatter={(value, name, props) => [
+                  `${value} usuarios (${((value as number / responses.length) * 100).toFixed(1)}%)`,
+                  props.payload.gender
+                ]} />
+                <Legend />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+        
+        {/* Gráfico de rendimiento por género */}
+        <div>
+          <h3 className="font-medium text-gray-700 mb-3">Rendimiento por Género</h3>
+          <div className="h-64">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={genderChartData}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="age" />
+                <XAxis dataKey="gender" />
                 <YAxis domain={[0, 100]} tickFormatter={(val) => `${val}%`} />
-                <Tooltip formatter={(value: number) => [`${value}%`, "Porcentaje"]} />
+                <Tooltip formatter={(value: number) => [`${value.toFixed(1)}%`, "Porcentaje"]} />
                 <Legend />
                 <Bar dataKey="correctRate" fill="#6366f1" name="Aciertos" />
                 <Bar dataKey="averageScore" fill="#82ca9d" name="Puntaje promedio" />
@@ -649,8 +680,44 @@ const genderChartData = Object.entries(genderStats).map(([gender, stats]) => ({
           </div>
         </div>
       </div>
+      
+      {/* Tabla de datos por edad y género */}
+      <div className="mt-6">
+        <h3 className="font-medium text-gray-700 mb-3">Detalle por Edad y Género</h3>
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Edad</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Género</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Usuarios</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Respuestas</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aciertos</th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {ageChartData.flatMap(ageData => 
+                Object.entries(ageData.genders).map(([gender, count], i) => (
+                  <tr key={`${ageData.rawAge}-${gender}-${i}`}>
+                    <td className="px-6 py-4 whitespace-nowrap">{ageData.age}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">{gender}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">{count}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {ageData.responses}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {ageData.correctRate.toFixed(1)}%
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   );
+
 
   return (
     <>
@@ -659,39 +726,7 @@ const genderChartData = Object.entries(genderStats).map(([gender, stats]) => ({
           <Link className='px-4 py-2 rounded-lg transition font-semibold bg-indigo-100 hover:bg-indigo-200 text-indigo-800' href='/'>Inicio</Link>
           <Link className='px-4 py-2 rounded-lg transition font-semibold bg-indigo-100 hover:bg-indigo-200 text-indigo-800' href='/cuestionario'>Cuestionario</Link>
           <Link className='px-4 py-2 rounded-lg transition font-semibold bg-indigo-100 hover:bg-indigo-200 text-indigo-800' href='/estadisticas'>Estadísticas</Link>
-        </nav>
-      </header>
-      
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold text-indigo-800">Dashboard de Estadísticas</h1>
-          <div className="flex gap-2">
-            <button 
-              onClick={exportToExcel}
-              disabled={responses.length === 0}
-              className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition flex items-center gap-2 disabled:bg-gray-400 disabled:cursor-not-allowed"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
-              </svg>
-              Exportar a Excel
-            </button>
-            <button 
-              onClick={resetStatistics}
-              disabled={isResetting || responses.length === 0}
-              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition flex items-center gap-2 disabled:bg-red-300 disabled:cursor-not-allowed"
-            >
-              {isResetting ? (
-                <>
-                  <svg className="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  Borrando...
-                </>
-              ) : (
-                <>
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+w.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                     <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
                   </svg>
                   Reiniciar Estadísticas

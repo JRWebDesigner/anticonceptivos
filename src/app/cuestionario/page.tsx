@@ -283,9 +283,14 @@ export default function Questionnaire() {
   };
 
   const handleComplete = () => {
-    setIsComplete(true);
-    saveResponses(answers, userData.name, parseInt(userData.age));
-  };
+  setIsComplete(true);
+  saveResponses(
+    answers,           // Respuestas del cuestionario
+    userData.name,     // Nombre del usuario
+    parseInt(userData.age), // Edad (convertida a número)
+    userData.gender    // Género del usuario (nuevo parámetro)
+  );
+};
 
   const resetQuiz = () => {
     setCurrentQuestion(0);

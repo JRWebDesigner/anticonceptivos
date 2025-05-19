@@ -20,6 +20,7 @@ interface ResponseData {
   userId?: string;
   userName: string;
   userAge: number;
+  userGender: string;
 }
 
 interface Question {
@@ -269,6 +270,11 @@ const questions: Question[] = [
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82CA9D'];
 
+const formatAge = (age: number | string) => {
+  const ageNum = typeof age === 'string' ? parseInt(age) : age;
+  return ageNum >= 21 ? '+21 años' : `${ageNum} años`;
+};
+
 export default function StatsDashboard() {
   const [responses, setResponses] = useState<ResponseData[]>([]);
   const [loading, setLoading] = useState(true);
@@ -276,7 +282,6 @@ export default function StatsDashboard() {
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
   const [isResetting, setIsResetting] = useState(false);
 
-  // Obtener respuestas de Firestore
   useEffect(() => {
     const fetchResponses = async () => {
       try {
@@ -321,22 +326,49 @@ export default function StatsDashboard() {
   const dateStats = responses.reduce((acc, response) => {
     const date = format(new Date(response.timestamp?.seconds * 1000), 'yyyy-MM-dd', { locale: es });
     if (!acc[date]) acc[date] = { correct: 0, total: 0, count: 0 };
+  const genderStats = responses.reduce((acc, response) => {
+    const gender = response.userGender || 'No especificado';
     
-    const correctAnswers = response.answers.reduce((sum, answer, i) => {
-      if (answer !== null) {
-        acc[date].total++;
+    if (!acc[gender]) {
+      acc[gender] = {
+        correct: 0,
+        total: 0,
+        count: 0,
+        users: new Set<string>()
+      };
+    }
+
+    if (response.userId) {
+      acc[gender].users.add(response.userId);
+    }
+
+const correctAnswers = response.answers.reduce((sum, answer, i) => {
+      if (answer !== null && questions[i]) {
+        acc[gender].total++;
         if (answer === questions[i].correctAnswer) {
           return sum + 1;
         }
       }
       return sum;
     }, 0);
-    
-    acc[date].correct += correctAnswers;
-    acc[date].count++;
-    return acc;
-  }, {} as Record<string, { correct: number; total: number; count: number }>);
 
+    acc[gender].correct += correctAnswers;
+    acc[gender].count++;
+
+    return acc;
+  }, {} as Record<string, {
+    correct: number;
+    total: number;
+    count: number;
+    users: Set<string>;
+  }>);
+const genderChartData = Object.entries(genderStats).map(([gender, stats]) => ({
+    gender,
+    correctRate: stats.total ? (stats.correct / stats.total) * 100 : 0,
+    averageScore: stats.count ? (stats.correct / (stats.count * questions.length)) * 100 : 0,
+    responses: stats.count,
+    users: stats.users.size
+  }));
   const dateChartData = Object.entries(dateStats).map(([date, stats]) => ({
     date,
     correctRate: stats.total ? (stats.correct / stats.total) * 100 : 0,
@@ -359,25 +391,6 @@ export default function StatsDashboard() {
         lastResponse: response.timestamp as Timestamp
       };
     }
-    
-    const correctAnswers = response.answers.reduce((sum, answer, i) => {
-      if (answer !== null) {
-        acc[userId].total++;
-        if (answer === questions[i].correctAnswer) {
-          return sum + 1;
-        }
-      }
-      return sum;
-    }, 0);
-    
-    acc[userId].correct += correctAnswers;
-    acc[userId].count++;
-    if (response.timestamp > acc[userId].lastResponse) {
-      acc[userId].lastResponse = response.timestamp;
-    }
-    
-    return acc;
-  }, {} as Record<string, { name: string; age: number; correct: number; total: number; count: number; lastResponse: any }>);
 
   const userChartData = Object.entries(userStats).map(([userId, stats]) => ({
     userId,
@@ -415,6 +428,7 @@ export default function StatsDashboard() {
   }));
 
   // Estadísticas por edad
+    
   const ageStats = responses.reduce((acc, response) => {
         // 1. Manejo seguro de la edad (asumiendo que userAge es number)
         const age = typeof response.userAge === 'number' ? response.userAge : 0;

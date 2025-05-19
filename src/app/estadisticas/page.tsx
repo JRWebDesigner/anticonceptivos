@@ -430,49 +430,49 @@ const genderChartData = Object.entries(genderStats).map(([gender, stats]) => ({
   // Estadísticas por edad
     
   const ageStats = responses.reduce((acc, response) => {
-        // 1. Manejo seguro de la edad (asumiendo que userAge es number)
-        const age = typeof response.userAge === 'number' ? response.userAge : 0;
-        
-        // 2. Inicialización del registro por edad
-        if (!acc[age]) {
-            acc[age] = {
-                correct: 0,
-                total: 0,
-                count: 0,
-                users: new Set<string>() // Set explícitamente tipado como string
-            };
+    const age = response.userAge >= 21 ? 21 : response.userAge;
+    const gender = response.userGender || 'No especificado';
+    
+    if (!acc[age]) {
+      acc[age] = {
+        correct: 0,
+        total: 0,
+        count: 0,
+        users: new Set<string>(),
+        genders: {} as Record<string, number>
+      };
+    }
+
+    if (!acc[age].genders[gender]) {
+      acc[age].genders[gender] = 0;
+    }
+    acc[age].genders[gender]++;
+
+    if (response.userId) {
+      acc[age].users.add(response.userId);
+    }
+
+    const correctAnswers = response.answers.reduce((sum, answer, i) => {
+      if (answer !== null && questions[i]) {
+        acc[age].total++;
+        if (answer === questions[i].correctAnswer) {
+          return sum + 1;
         }
+      }
+      return sum;
+    }, 0);
 
-        // 3. Validación segura del userId antes de agregarlo
-        if (response.userId && typeof response.userId === 'string') {
-            acc[age].users.add(response.userId);
-        } else {
-            console.warn(`UserId inválido o faltante en respuesta para edad ${age}`);
-            // Opcional: return acc; si quieres omitir respuestas sin userId válido
-        }
+    acc[age].correct += correctAnswers;
+    acc[age].count++;
 
-        // 4. Cálculo de respuestas correctas con protección de índice
-        const correctAnswers = response.answers.reduce((sum, answer, i) => {
-            if (answer !== null && questions[i]) { // Verifica que la pregunta exista
-                acc[age].total++;
-                if (answer === questions[i].correctAnswer) {
-                    return sum + 1;
-                }
-            }
-            return sum;
-        }, 0);
-
-        // 5. Actualización de estadísticas
-        acc[age].correct += correctAnswers;
-        acc[age].count++;
-
-        return acc;
-    }, {} as Record<number, {
-        correct: number;
-        total: number;
-        count: number;
-        users: Set<string>;
-    }>);
+    return acc;
+  }, {} as Record<number, {
+    correct: number;
+    total: number;
+    count: number;
+    users: Set<string>;
+    genders: Record<string, number>;
+  }>);
   const ageChartData = Object.entries(ageStats).map(([age, stats]) => ({
     age: `${age} años`,
     correctRate: stats.total ? (stats.correct / stats.total) * 100 : 0,
@@ -482,49 +482,7 @@ const genderChartData = Object.entries(genderStats).map(([gender, stats]) => ({
   }));
 
   // Datos de usuario seleccionado
-  const userResponses = selectedUser 
-    ? responses.filter(r => r.userId === selectedUser)
-    : [];
-
-  // Exportar a Excel
-  const exportToExcel = () => {
-  // Hoja 1: Respuestas detalladas (mejorada)
-  const responsesSheet = responses.map((response, idx) => {
-    const answersFormatted = response.answers.map((answer, i) => {
-      if (answer === null) return 'Sin responder';
-      const isCorrect = answer === questions[i].correctAnswer;
-      return `${answer + 1} (${isCorrect ? '✔' : '✘'})`;
-    });
-
-    const correctAnswers = response.answers.reduce((sum, answer, i) => {
-      return answer === questions[i].correctAnswer ? sum + 1 : sum;
-    }, 0);
-    
-    const percentage = (correctAnswers / questions.length * 100).toFixed(1);
-
-    return {
-      "ID": idx + 1,
-      "Usuario": response.userName,
-      "Edad": response.userAge,
-      "Fecha": format(new Date(response.timestamp?.seconds * 1000), 'dd/MM/yyyy HH:mm', { locale: es }),
-      "Puntaje Total": `${correctAnswers}/${questions.length}`,
-      "Porcentaje": `${percentage}%`,
-      ...questions.reduce((acc, q, i) => {
-        acc[`P${i + 1}`] = answersFormatted[i];
-        return acc;
-      }, {} as Record<string, string>)
-    };
-  });
-
-  // Hoja 2: Resumen por edad (mejorado)
-  const ageSummarySheet = ageChartData.map(age => ({
-    "Grupo de Edad": age.age,
-    "Usuarios Únicos": age.users,
-    "Total Respuestas": age.responses,
-    "Preguntas Correctas": `${age.correctRate.toFixed(1)}%`,
-    "Puntaje Promedio": `${age.averageScore.toFixed(1)}%`,
-    "Desempeño": getPerformanceLevel(age.averageScore)
-  }));
+);
 
   // Hoja 3: Resumen por pregunta
   const questionsSheet = questions.map((q, i) => {

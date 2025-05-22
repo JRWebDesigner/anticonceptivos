@@ -270,11 +270,6 @@ const questions: Question[] = [
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82CA9D'];
 
-const formatAge = (age: number | string) => {
-  const ageNum = typeof age === 'string' ? parseInt(age) : age;
-  return ageNum >= 21 ? '+21 años' : `${ageNum} años`;
-};
-
 export default function StatsDashboard() {
   const [responses, setResponses] = useState<ResponseData[]>([]);
   const [loading, setLoading] = useState(true);
@@ -477,18 +472,18 @@ export default function StatsDashboard() {
 
   // Estadísticas por edad
   const ageStats = responses.reduce((acc, response) => {
-    const age = response.userAge >= 21 ? 21 : response.userAge;
-    const gender = response.userGender || 'No especificado';
-    
-    if (!acc[age]) {
-      acc[age] = {
-        correct: 0,
-        total: 0,
-        count: 0,
-        users: new Set<string>(),
-        genders: {} as Record<string, number>
-      };
-    }
+  const age = response.userAge; // Usamos la edad exacta ahora
+  const gender = response.userGender || 'No especificado';
+  
+  if (!acc[age]) {
+    acc[age] = {
+      correct: 0,
+      total: 0,
+      count: 0,
+      users: new Set<string>(),
+      genders: {} as Record<string, number>
+    };
+  }
 
     if (!acc[age].genders[gender]) {
       acc[age].genders[gender] = 0;
@@ -514,23 +509,24 @@ export default function StatsDashboard() {
 
     return acc;
   }, {} as Record<number, {
-    correct: number;
-    total: number;
-    count: number;
-    users: Set<string>;
-    genders: Record<string, number>;
+  correct: number;
+  total: number;
+  count: number;
+  users: Set<string>;
+  genders: Record<string, number>;
   }>);
 
-  const ageChartData = Object.entries(ageStats).map(([age, stats]) => ({
-    age: formatAge(age),
+  const ageChartData = Object.entries(ageStats)
+  .map(([age, stats]) => ({
+    age: `${age} años`, // Mostrar edad exacta
     rawAge: parseInt(age),
     correctRate: stats.total ? (stats.correct / stats.total) * 100 : 0,
     averageScore: stats.count ? (stats.correct / (stats.count * questions.length)) * 100 : 0,
     responses: stats.count,
     users: stats.users.size,
     genders: stats.genders
-  }));
-
+  }))
+  .sort((a, b) => a.rawAge - b.rawAge); 
   // Exportar a Excel
   const exportToExcel = () => {
     // Hoja 1: Respuestas detalladas
@@ -550,7 +546,7 @@ export default function StatsDashboard() {
       return {
         "ID": idx + 1,
         "Usuario": response.userName,
-        "Edad": formatAge(response.userAge),
+        "Edad": response.userAge,
         "Género": response.userGender || 'No especificado',
         "Fecha": format(new Date(response.timestamp?.seconds * 1000), 'dd/MM/yyyy HH:mm', { locale: es }),
         "Puntaje Total": `${correctAnswers}/${questions.length}`,
@@ -564,13 +560,16 @@ export default function StatsDashboard() {
 
     // Hoja 2: Resumen por edad
     const ageSummarySheet = ageChartData.map(age => ({
-      "Grupo de Edad": age.age,
-      "Usuarios Únicos": age.users,
-      "Total Respuestas": age.responses,
-      "Preguntas Correctas": `${age.correctRate.toFixed(1)}%`,
-      "Puntaje Promedio": `${age.averageScore.toFixed(1)}%`,
-      "Desempeño": getPerformanceLevel(age.averageScore)
-    }));
+  "Edad": age.rawAge, // Mostramos el número de edad directamente (ej: 22 en vez de "22 años")
+  "Usuarios Únicos": age.users,
+  "Total Respuestas": age.responses,
+  "Porcentaje de Aciertos": `${age.correctRate.toFixed(1)}%`,
+  "Puntaje Promedio": `${age.averageScore.toFixed(1)}%`,
+  "Nivel de Desempeño": getPerformanceLevel(age.averageScore),
+  "Detalle por Género": Object.entries(age.genders)
+    .map(([gender, count]) => `${gender}: ${count}`)
+    .join(", ")
+}));
 
     // Hoja 3: Resumen por pregunta
     const questionsSheet = questions.map((q, i) => {
@@ -594,7 +593,7 @@ export default function StatsDashboard() {
     const usersSheet = userChartData.map(user => ({
       "ID Usuario": user.userId,
       "Nombre": user.name,
-      "Edad": formatAge(user.age),
+      "Edad": user.age,
       "Género": user.gender,
       "Total Respuestas": user.responses,
       "Puntaje Promedio": `${user.averageScore.toFixed(1)}%`,
@@ -681,9 +680,14 @@ export default function StatsDashboard() {
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={ageChartData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="age" />
-                <YAxis />
+  <CartesianGrid strokeDasharray="3 3" />
+  <XAxis 
+    dataKey="age"
+    label={{ value: 'Edad', position: 'insideBottomRight', offset: -5 }}
+  />
+  <YAxis 
+    label={{ value: 'Cantidad', angle: -90, position: 'insideLeft' }}
+  />
                 <Tooltip 
                   formatter={(value: number, name: string) => 
                     name === 'users' 
@@ -999,7 +1003,7 @@ export default function StatsDashboard() {
                               onClick={() => setSelectedUser(user.userId)}
                             >
                               <td className="px-6 py-4 whitespace-nowrap">{user.name}</td>
-                              <td className="px-6 py-4 whitespace-nowrap">{formatAge(user.age)}</td>
+                              <td className="px-6 py-4 whitespace-nowrap">{user.age}</td>
                               <td className="px-6 py-4 whitespace-nowrap">{user.gender}</td>
                               <td className="px-6 py-4 whitespace-nowrap">{user.averageScore.toFixed(1)}%</td>
                               <td className="px-6 py-4 whitespace-nowrap">{user.lastResponse}</td>

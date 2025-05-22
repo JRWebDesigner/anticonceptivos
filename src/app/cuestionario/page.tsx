@@ -350,19 +350,16 @@ export default function Questionnaire() {
               <label htmlFor="age" className="block text-sm font-medium text-gray-700 mb-1">
                 Edad
               </label>
-              <select
+              <input 
+                type="number"
                 id="age"
                 name="age"
                 value={userData.age}
                 onChange={handleUserDataChange}
                 required
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
-              >
-                <option value="">Selecciona tu edad</option>
-                {[15, 16, 17, 18, 19,20,21].map(age => (
-                  <option key={age} value={age}>{age === 21 ? '+21 años' : `${age} años`}</option>
-                ))}
-              </select>
+                placeholder="Ingresa tu edad"
+              />
             </div>
             <div>
               <label htmlFor="gender" className="block text-sm font-medium text-gray-700 mb-1">
